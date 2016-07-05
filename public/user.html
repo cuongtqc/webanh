@@ -1,0 +1,81 @@
+<html>
+<head>
+	<title>Admin</title>
+	<script src="/javascripts/jquery-1.12.4.min.js" type="text/javascript"></script>
+	<script src="/javascripts/main.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="/stylesheets/reset.css">
+	<link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+</head>
+<body>
+	<!-- Body -->
+	<div class = "container padding-top">
+		
+		<!-- Main -->
+		<div class = "container padding-standard">
+			<!-- Border with title -->
+			<fieldset class = "main-container">
+
+				<legend class = "name-main-container">Album list</legend><!-- title -->
+				<!-- List of album -->
+				<div  class = "margin-standard">
+					<div class = "margin-standard">
+						<!-- Create new album form -->
+						<div class = "container left col-50">
+							<input type = "text" class = "text-input col-60" placeholder = "Name of new album...">
+							<input type = "button" class = "text-input col-30" value = "Add new Album">
+						</div>
+						<!-- Album search box -->
+						<div class = "container col-50 right">
+							<form action="/search" method="post" accept-charset="utf-8">
+								<input type = "submit" hidden>
+								<input type = "text" class = "text-input col-70 right" placeholder = "Search album by name...">	
+							</form>			
+						</div>
+					</div>
+					<div class = "clear-both">
+						
+					</div>
+
+					<!-- Show list of album using table -->
+					<div class = "margin-standard">
+						<table class = "container">
+							<thead>
+								<tr class = "container">
+									<th id = "thead-number" class = "col-10">#</th>
+									<th id = "thead-title" class = "col-40">Title</th>
+									<th id = "thead-timestamp" class = "col-20">Created at</th>
+									<th id = "thead-numberOfPhoto" class = "col-10">Num. of Photos</th>
+									<th id = "thead-action" class = "col-20">Action</th>
+								</tr>
+							</thead>
+							<tbody id = "row-list">
+								<tr id = "album-1">
+									<div class = "clear-both"></div>
+									<td>1</td>
+									<td>My photo</td>
+									<td>10/10/2995</td>
+									<td>9</td>
+									<td>
+										<div class = "button-primary left">Save</div>
+										<div class = "button-danger right">Cancel</div>
+									</td>
+									<div class = "clear-both"></div>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<!-- Pagination -->
+					<div class = "pagination margin-standard">
+						<li class = "page"><a href = "#">Lastest</a></li>
+						<li class = "page"><a href = "#">1</a></li>
+						<li class = "page"><a href = "#">Oldest</a></li>
+					</div>
+
+				</div><!-- End list of album -->
+
+			</fieldset><!-- End border with title -->
+		</div>
+		
+	</div>
+</body>
+</html>
