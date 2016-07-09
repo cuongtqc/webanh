@@ -2,10 +2,11 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var mysql = require('mysql');
 var Q = require('q');
+var User = require('./users.js');
 
 var router = express.Router();
 var publicPath = __dirname.slice(0,__dirname.length-6) + "public/";
-var userToken;
+var user = new User({currentAlbumIndex:1, currentPhotoIndex: 1});
 
 var connection = mysql.createConnection({
 	host     : 'localhost',
@@ -15,167 +16,208 @@ var connection = mysql.createConnection({
 });
 
 connection.connect();
-// var a = connection.query("CREATE TABLE IF NOT EXISTS USER (" +
-// 	"id int(10) auto_increment, "+
-// 	"username char(40), " +
-// 	"password char(40), " +
-// 	"createAt timestamp, " +
-// 	"primary key (id, username)" +
-// 	")");
 
-// connection.query("INSERT INTO USER (id, username, password, createAt) VALUES (2016001, 'quangcuong0808', 123, NOW())");
+// Get USER INFO at the moment
+router.post('/user/current/userInfo', function(req, res){
+	console.log(JSON.stringify(req.session.user));
+	res.json(JSON.stringify(req.session.user||user));
+});
 
-// GETTOKEN: Get token from database
-var getToken = function(username){
-	var def = Q.defer();
-		connection.query("SELECT tooken FROM USER WHERE USER.username='"+username+"'",
+// For NOT admin user: HOME PAGE
+	router.get('/', function(req, res){
+		if (req.session.user) {
+			req.session.user.location = "<strong> &raquo; Home </strong>";
+		} else {
+			var user = new User({});
+			user.location = "<strong> &raquo; Home </strong>";
+			req.session.user = user;
+		};
+		res.sendFile(publicPath + 'user-albumlist.html');
+	});
+
+	//  For NOT admin user: ALBUM LOAD USING AJAX
+	router.post('/resource/get8Album/:currentAlbumIndex/:limit', function(req, res){
+		var x = parseInt(req.params.currentAlbumIndex);
+		var albumIndex = x -1;
+		var limit = parseInt(req.params.limit);
+		console.log(limit);
+
+		connection.query(
+				'SELECT PHOTOS.name as coverName, ALBUMS.name as albumName, ALBUMS.id, ALBUMS.createAt, ALBUMS.numberOfPhoto '+
+				'FROM PHOTOS '+
+				'RIGHT JOIN ALBUMS ON ALBUMS.name = PHOTOS.album '+
+				'GROUP BY albumName '+
+				'LIMIT ' + limit +
+				' OFFSET ' + albumIndex, 
+				
 			function(err, rows, fields){
-				//console.log("GET TOKEN: ", err, rows, fields);
-				if (err) {def.reject(err)}
+				if (err) { console.log(err)}
+				else {
+					if (rows.length == 0) {
+						console.log('Get-all-album: Do not have any album.')
+						res.send('Dont have any album to load.')
+					}
+					else {
+						connection.query('SELECT numberOfAlbum FROM USERS WHERE USERS.username = "'+req.session.user.username+'"', function(err2, rows2, fields2){
+							if (err2) {res.send(err2)}
+							else if (rows.length >=1 ) {
+								req.session.user.currentAlbumIndex = x + 7;
+								req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
+								console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
+								res.json({ data:rows , user:req.session.user});
+								console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
+								console.log('Get-all-album: Okay, albums are sent.')
+							};
+						});
+						
+					}
+				}
+		});
+	});
+
+// For NOT admin user: VIEW PHOTO
+	router.get('/album/:albumAlias', function(req, res){
+		var albumName = req.params.albumAlias.replace('-', ' ');
+		req.session.user.currentAlbumName = albumName;
+		req.session.user.location = '<strong><a href = "/"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
+		req.session.user.currentPhotoIndex = 1;
+		res.sendFile(publicPath + 'user-albumdetail.html');
+	});
+
+	// For NOT admin user: LOAD PHOTO
+	router.post('/resource/get8Photo/:currentAlbumName/:currentPhotoIndex', function(req, res){
+		var currentAlbumName = (req.params.currentAlbumName).replace('-', ' ');
+		var currentPhotoIndex = parseInt(req.params.currentPhotoIndex) - 1;
+		connection.query(
+			'SELECT * FROM PHOTOS WHERE (PHOTOS.album = "'+currentAlbumName+'") LIMIT 8 OFFSET ' + currentPhotoIndex,
+			function(err, rows, fields){
+
+				if (err) { console.log(" Loading photo error: ", err)}
 				else {
 					console.log(rows);
-					if (rows.length >=1 ) {
-						def.resolve(rows[0].tooken);
-					} else {
-						def.reject("From GetToken: Not found token.")
-					};
+					if (rows.length == 0) {
+						console.log('Not have any photo. '); 
+						res.send('Do not have photo to load.')
+					}
+					else {
+						req.session.user.currentPhotoIndex += 8;
+						req.session.user.location = '<strong> <a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
+						console.log(req.session.user.currentPhotoIndex);
+						res.json({ data:rows , user:req.session.user});
+						console.log('Get 8 Photo: Okay, Photos are sent.')
+					}
 				}
 			}
 		);
-	return def.promise;
-}
+	});
 
-// LOGIN: login user
-// Pre-cons: went into /admin/login or login failed, is FIRSTTIME log in.
-// If logged in write tooken into cookies and redirect to /admin
-// if not logged in then refresh page
-var login = function(req, res, next){
-	connection.query("SELECT username, password FROM USER WHERE (username='" +
-		req.body.username + 
-		"') AND (password='" + 
-		req.body.password+
-		"');" , 
-		function(err, rows, fields){
-			res.status(200);
-			if (err) { 
-				console.log('From LOGIN: Something went wrong.');
+
+// For ADMIN USER
+	router.get('/admin', function(req, res){
+		if (req.storage.user) {
+			console.log('req.storage.user = ', req.storage.user);
+			if (req.storage.user.remember) {
+				req.storage.user.location = '<strong><a href = "/"> &raquo; Home</a></strong>';
+				req.session.user = req.storage.user;
+				res.sendFile(publicPath + 'admin.html');
+			} else {
 				res.redirect('/admin/login');
 			}
-			else if (rows.length>=1) {
-				// write cookies
-				//res.cookie('logged', 'true', { maxAge: 900000, httpOnly: false});
-				req.session.logged = true;
-				req.session.username = req.body.username;
-				if (req.body.rememberme == true) {
-					res.cookie('tooken_username', rows[0].username, { maxAge: 900000, httpOnly: false});
-					res.cookie('tooken_remember', 'remembermeyes', { maxAge: 900000, httpOnly: false});
-					console.log('From LOGIN: Wrote info to cookies')
-				};
-				res.redirect('/admin')
+		} else if (req.session.user) {
+			console.log('req.session.user = ', req.session.user);
+			if (req.session.user.logged) {
+				res.sendFile(publicPath + 'admin.html');
 			} else {
-				console.log('From LOGIN: Username or Password does not match.');
-				res.type('text/html');
-				res.send('<script>alert("Username or Password does not match."); window.location.href="/admin/login";</script>');
+				res.redirect('/admin/login');
 			}
+		} else {
+			console.log('not create user');
+			req.session.user =  new User({});
+			res.send('<script>window.location.href = "/admin/login"</script>');
+		}
+	})
+
+	router.post('/admin/login', function(req, res){
+		console.log('From USER: Login...');
+		connection.query("SELECT username, password, email, numberOfAlbum FROM USERS WHERE (username='" +
+			req.body.username + 
+			"') AND (password='" + 
+			req.body.password+
+			"');" , 
+			function(err, rows, fields){
+				res.status(200);
+				console.log("rememberme  = " , req.params.remember);
+				var remember = (req.body.remember=='on')?true:false;
+				if (err) { 
+					console.log('From USER -> Login: Something went wrong.');
+					req.redirect('/admin/login');
+				}
+				else if (rows.length>=1) {
+					if (remember == true) { // Write to storage
+						req.storage.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true});
+						console.log('From LOGIN: Wrote info to client storage');
+					};
+					// Write to session
+					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true});
+					res.redirect('/admin')
+				} else {
+					console.log('From LOGIN: Username or Password does not match.');
+					res.type('text/html');
+					res.send('<script>alert("Username or Password does not match."); window.location.href="/admin/login";</script>');
+				}
+		});
 	});
 	
-}
-
-// ISLOGIN : check that user have been logged in or not
-// if islogin redirect user to /admin
-// if not redirect user to /
-var islogin = function(req, res, next){
-	req.session.username = req.session.username || "";
-	var clientToken = req.cookies?(req.cookies.tooken_remember?req.cookies.tooken_remember:""):"";
-	getToken(req.session.username).then(function(token){
-		if (req.session.logged == true || clientToken==token) {
-			console.log('From ISLOGIN: Redirecting to admin...');
-			res.redirect('/admin');
-		} else {
-			console.log('From ISLOGIN: Redirecting to user...');
-			res.sendFile(publicPath + 'user.html');
-		};
-	});
-}
-
-// GO ADMIN PAGE: redirect user to admin page
-// Pre-cons: no
-// if logged in, change session albums and return admin.html
-// if not return login page.
-
-var goAdminPage = function(req, res, next){
-	req.session.username = req.session.username || "";
-	var clientToken = req.cookies?(req.cookies.tooken_remember?req.cookies.tooken_remember:""):"";
-	if ( req.session.logged == true ) {
-		//console.log(req.session.logged);
-		res.sendFile(publicPath + 'admin.html');
-	} else {
-
-		if (clientToken != '') {
-			getToken(req.session.username).then(function(userToken){
-				if (userToken == clientToken) {
-					// var def = Q.defer();
-					// connection.query("SELECT * FROM ALBUMS LIMIT 8",
-					// 	function(err, rows, fields){
-					// 		if (err) {def.reject(err)}
-					// 		else if (rows) {
-								// write 8 album to cookies
-								// res.type('text/html'); 
-								// res.status(200); 
-								// res.cookie('albums', JSON.stringify(rows[0]), {maxAge: 900000, httpOnly: false});
-								// res.cookie('currentIndexOfAlbum', rows.length, {maxAge: 900000, httpOnly: false});
-					 			res.sendFile(publicPath + 'admin.html');
-					 			// def.resolve();
-							// };
-					// });	
-				} else {
-					console.log("From: goAdminPage: token failed ...", userToken);
-					res.redirect('/admin/login');	
-				};
-			})
-		}
-		else {
-				console.log("From: goAdminPage: token failed");
-				res.redirect('/admin/login');
-		};
-	}
-}
-
-// LOGOUT: clear everything from user cookies and session
-var logout = function(req, res, next){
-	res.clearCookie('tooken_username');
-	res.clearCookie('tooken_remember');
-	req.session.logged = false;
-	console.log('From LOGOUT: logged out...');
-	res.redirect('/admin');
-}
-// 
-var loadMoreAlbum = function(req, res, next){
-	if (req.session.logged == true) {
-		connection.query("SELECT * FROM ALBUMS WHERE ALBUMS.id > " + req.session.currentAlbumIndex + "LIMIT 8",
+	router.post('/admin/addAlbum', function(req, res){
+		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name = "'+ req.body.albumName+'"',
 			function(err, rows, fields){
-				if (err) {console.log(err)}
-				else if (rows.length>=1) {
-					req.session.albums = JSON.parse(rows);
-					if (req.session.currentAlbumIndex % 8 != 0  ) {req.session.noMoreImageToLoad = true};
-					res.jsonp(req.session.albums);
-				}
+				if (err) { console.log(err); res.send(err)}
+				else if (rows.length >= 1) {
+					res.send('<script>alert("New album name existed. Please pick another one.")</script>');
+				} else if (rows.length == 0) {
+					connection.query('INSERT INTO ALBUMS (name, numberOfPhoto, owner) '+
+									'VALUES ("'+ req.body.albumName+'", 0, "'+req.session.user.username+'");'+
+									'',
+										function(err2, rows2, field2){
+											if (err2) {res.send(err2)}
+											else if (rows2) {
+												console.log("From AddAlbum: ", rows2);
+												req.session.user.numberOfAlbum+=1;
+												connection.query('UPDATE USERS SET numberOfAlbum = ' + 
+																	req.session.user.numberOfAlbum +
+																	' WHERE username = "'+ 
+																	req.session.user.username+'"'
+																	, function(err3, rows3, fields3){
+																		if (err3) { res.send(err3)}
+																		else {
+																			res.send('<script>alert("Add album '+req.body.albumName+' success."); window.location.href = "/admin"</script>');
+																		}
+												});
+											};
+										}
+					);
+				};
 			}
 		);
-	} else {
-		console.log('error: you must log in first');
-	};
-}
-
-
-router.get('/', islogin);
-router.get('/admin', goAdminPage);
-router.post('/admin/login', login);
-router.get('/admin/logout', logout);
+	});
 router.get('/admin/login', function(req, res, next) {
 	res.type('text/html'); 
 	res.status(200); 
 	res.sendFile(publicPath + 'login.html');
 });
 
+router.get('/admin/logout', function(req, res, next) {
+	if (req.session.user) {
+		req.session.user = null;
+	};
+	if (req.storage.user) {
+		req.storage.user = null;
+	};
+	res.redirect('/admin');
+});
+
+
+router.get('/error', function(req, res){
+	res.sendFile(publicPath + 'error.html');
+});
 module.exports = router;

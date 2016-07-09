@@ -12,8 +12,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: false })); // support encoded bodies
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cookieParser());
-app.use(session({secret: '123456789', duration: 30*60*1000, activeDuration: 5*60*1000, cookieName: 'session'}));
+//app.use(cookieParser());
+
+
+app.use(session({secret: '432rsaf', cookieName: 'session', cookie: {ephemeral: true}}));
+app.use(session({secret: '123456789', cookieName: 'storage', cookie: {ephemeral: false}}));
 
 app.use('/', routes);
 

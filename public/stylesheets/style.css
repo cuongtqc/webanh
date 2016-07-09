@@ -13,10 +13,32 @@
 		border: 1px solid black;
 	}
 
+	th {
+		background-color: #f3f3f3;
+	}
+
 	td {
-		height: 30px;
-		vertical-align: center;
-		/*line-height: 30px;*/
+		height: 10px;
+		vertical-align: middle;
+		text-align: center;
+		background-color: #f0f0f0;
+	}
+
+	a {
+		color: white;
+	}
+
+	location {
+		display: block;
+		position: absolute;
+		top: 18px;
+		left: 230px;
+	}
+
+	location > a {
+		text-decoration: none;
+		color: blue;
+
 	}
 
 /*Class implement*/
@@ -33,7 +55,7 @@
 		clear: both;
 	}
 	
-	/*Index page: index.html*/
+	/*Login page: login.html*/
 		.login-board {
 			display: block;
 			position: relative;
@@ -65,24 +87,45 @@
 			top: 0px;
 			height: 35px;
 			width: 100%;
-			padding-top: 15px;
+			padding-top: 8px;
+			padding-bottom: 8px;
 			vertical-align: center;
-			background-image: radial-gradient(ellipse farthest-corner at 45px 45px , #9f9f9f 0%, #00ffff 50%, #3f3f3f 95%);
+			color: white;
+			opacity: 0.9;
+			background-image: url('../images/header.jpg');
+			box-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;
+		}
+		.logo-image {
+			position: absolute;
+			top: 10px;
+			left: 100px;
+			height: 35px;
+			width: auto;
+		}
+		.user-action {
+			position: relative;
+			right: 80px;
+		}
+		.user-action > a {
+			text-decoration: none;
 		}
 		.main-container {
-			margin-top: 100px;
+			margin-top: 70px;
 			margin-right: 100px;
 			margin-left: 100px;
 			border: 2px solid green;
 			width: auto;
 			height: auto;
+			/*opacity: 0.7;*/
+			background-image: url('../images/albumlist-background.jpg');
+			box-shadow: 1 1 2px black, 0 0 25px blue, 0 0 5px darkblue;	
 		}
 		.name-main-container {
 			margin-left: 15px;
 			color: green;
 		}
 		/*Button*/
-			.button-primary, .button-danger, .button-warning {
+			.button-primary, .button-danger, .button-warning, .button-classic {
 				display: inline-block;
 				height: 30px;
 				width: 40%;
@@ -90,7 +133,7 @@
 				color: white;
 				vertical-align: center;
 				text-align: center;
-				line-height: 30px;
+				line-height: 20px;
 			}
 			.button-primary {
 				background-color: #0066ff;
@@ -99,12 +142,24 @@
 				background-color: #ff0000;
 			}
 			.button-warning {
-				background-color: #ff6600
+				background-color: #ff6600;
+			}
+			.button-classic {
+				background-color: #f3f3f3;
+				color: black;
+				font-size: 14px;
+			}
+			.button-small {
+				height: 20px;
+				vertical-align: middle;
 			}
 
 		/*Pagination*/
 			.pagination {
 				margin-top: 30px;
+				width: 80%;
+				margin-left: 10%;
+				margin-bottom: 15px;
 			}
 			.pagination > li {
 				display: inline-block;
@@ -123,8 +178,70 @@
 				color: green;
 			}
 
+	/*User album-list page*/
+		.album-boundary {
+			position: relative;
+			width: 25%;
+			height: 200px;
+		}
+		.album-thumb {
+			position: absolute;
+			margin-left: 20px;
+			margin-right: 20px;
+			top: 0px;
+			width: auto;
+			height: 170px;
+			border: 1px solid green;
+			overflow: hidden;
+		}
+		[id *= "album-thumb"] {
+			height: 170px;
+			width: 100%;
+		}
 
-	
+		.album-title {
+			/*display: block;*/
+			position: absolute;
+			margin-left: 20px;
+			margin-right: 20px;
+			bottom: 0px;
+			width: auto; 
+			height: 30px;
+			line-height: 30px;
+			vertical-align: center;
+			/*text-overflow: ellipsis;*/
+		}
+
+		#album-title {
+			display: block;
+			width: auto;
+			text-align: center;
+		}
+		#show-more-album {
+			z-index:9999;
+		}
+
+		.main-container-user-albumlist {
+			margin-top: 50px;
+			margin-right: 100px;
+			margin-left: 100px;
+			padding-bottom: 25px;
+			margin-bottom: 20px;
+			border: 2px solid green;
+			width: auto;
+			height: auto;
+		}
+		.name-main-container-user-albumlist {
+			text-align: center;
+			color: green;
+		}
+		.left-30 {
+			margin-left: 30%;
+		}
+		.album-on-click {
+			z-index: 9999;
+		}
+
 	/*A few standard*/
 		.margin-down {
 			margin-bottom: 10px;
@@ -141,6 +258,56 @@
 		}
 		.header-bounder {
 			margin: 10px 20px;
+		}
+		#pop-up-bounder {
+			position: absolute;
+			background-color: rgba(81, 81, 101, 0.9);
+			width: 100%;
+			height: 100%;
+			top: 0px;
+			left: 0px;
+			z-index: 9998;
+		}
+		#pop-up-image {
+			position: absolute;
+			width: 100%;
+			height: 500px;
+			max-height: 100%;
+			z-index: 9999;
+		}
+		.pop-up-image {
+			position: relative;
+			width: 60%;
+			height: 90%;
+			max-height: 100%;
+			top: 10%;
+			left: 20%;
+			z-index: 9999;
+		}
+		.button-close {
+			position: absolute;
+			width: 40px;
+			height: auto;
+			top: -35px;
+			right: -35px;
+			z-index: 10000;
+		}
+		#toggle {
+			position: absolute;
+			width: 100%;
+			height: 30px;
+			bottom: -30px;
+			background-color: rgba(81, 81, 101, 0.5);
+			border-top: 1px solid white;
+			color: white;
+		}
+		#toggle > strong {
+			display: block;
+			vertical-align: center;
+			line-height: 30px;
+		}
+		.highlight {
+			background-color: #afafaf !important;
 		}
 
 	/*Column*/
