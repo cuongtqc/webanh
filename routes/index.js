@@ -58,17 +58,37 @@ router.post('/user/current/userInfo', function(req, res){
 						res.send('Dont have any album to load.')
 					}
 					else {
-						connection.query('SELECT numberOfAlbum FROM USERS WHERE USERS.username = "'+req.session.user.username+'"', function(err2, rows2, fields2){
-							if (err2) {res.send(err2)}
-							else if (rows.length >=1 ) {
-								req.session.user.currentAlbumIndex = x + 7;
-								req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
-								console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
-								res.json({ data:rows , user:req.session.user});
-								console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
-								console.log('Get-all-album: Okay, albums are sent.')
-							};
-						});
+						if (req.session.user.username) {
+							connection.query('SELECT numberOfAlbum FROM USERS WHERE USERS.username = "'+req.session.user.username+'"', function(err2, rows2, fields2){
+								if (err2) {res.send(err2)}
+								else if (rows.length >=1 ) {
+									req.session.user.currentAlbumIndex = x + limit-1;
+
+									console.log('If admin');
+
+									req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
+									console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
+									res.json({ data:rows , user:req.session.user});
+									console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
+									console.log('Get-all-album: Okay, albums are sent.')
+								};
+							});
+						} else {
+							connection.query('SELECT SUM(numberOfAlbum) as numberOfAlbum FROM USERS', function(err2, rows2, fields2){
+								if (err2) {res.send(err2)}
+								else if (rows.length >=1 ) {
+									req.session.user.currentAlbumIndex = x + limit - 1;
+
+									console.log('If not admin');
+
+									req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
+									console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
+									res.json({ data:rows , user:req.session.user});
+									console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
+									console.log('Get-all-album: Okay, albums are sent.')
+								};
+							});
+						}
 						
 					}
 				}
