@@ -41,16 +41,15 @@
 						<!-- Create new album form -->
 						<div class = "container left col-50">
 							<form action = "/admin/addAlbum" method = "POST">
-								<input type = "text" class = "text-input col-60" name = "albumName" placeholder = "Name of new album...">
+								<input type = "text" class = "text-input col-60" name = "albumName" placeholder = " &#43; Name of new album..." required>
 								<input type = "submit" class = "text-input col-30" value = "Add new Album">
 							</form>
 						</div>
 						<!-- Album search box -->
 						<div class = "container col-50 right">
-							<form action="/search" method="post" accept-charset="utf-8">
-								<input type = "submit" hidden>
-								<input type = "text" class = "text-input col-70 right" placeholder = "Search album by name...">	
-							</form>			
+							<!-- <form id = "search" action = "/admin/search" method = "POST" accept-charset="utf-8"> -->
+								<input type = "text" id = "search-content" class = "text-input col-70 right" name = "search" placeholder = " &#128270; Search album by name..." required>	
+							<!-- </form>	 -->		
 						</div>
 					</div>
 					<div class = "clear-both">
@@ -62,11 +61,11 @@
 						<table class = "container">
 							<thead>
 								<tr class = "container">
-									<th id = "thead-number" class = "col-10"><div class = "button-classic">#</div></th>
+									<th id = "thead-number" class = "col-5"><div class = "button-classic">#</div></th>
 									<th id = "thead-title" class = "col-40"><div class = "button-classic">Title</div></th>
 									<th id = "thead-timestamp" class = "col-20"><div class = "button-classic">Created at</div></th>
-									<th id = "thead-numberOfPhoto" class = "col-10"><div class = "button-classic">Num.Photo</div></th>
-									<th id = "thead-action" class = "col-20"><div class = "button-classic">Action</div></th>
+									<th id = "thead-numberOfPhoto" class = "col-5"><div class = "button-classic">No.</div></th>
+									<th id = "thead-action" class = "col-30"><div class = "button-classic">Action</div></th>
 								</tr>
 							</thead>
 							<tbody id = "album-list">

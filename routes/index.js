@@ -20,7 +20,20 @@ connection.connect();
 // Get USER INFO at the moment
 router.post('/user/current/userInfo', function(req, res){
 	console.log(JSON.stringify(req.session.user));
-	res.json(JSON.stringify(req.session.user||user));
+	// connection.query('SELECT * FROM USERS WHERE USERS.name = "'+req.session.user.username+'"',
+	// 	function(err, rows, fields){
+	// 		if (err) {
+	// 			console.log("Error From getUserInfo:", err);
+	// 			res.send(err);
+	// 		} else {
+	// 			if (rows.length == 1) {
+	// 				req.session.user.total = rows[0].numberOfAlbum;
+					
+	// 			}
+	// 		}
+	// 	}
+	// );
+	res.json(JSON.stringify(req.session.user||user));				
 });
 
 // For NOT admin user: HOME PAGE
@@ -64,7 +77,7 @@ router.post('/user/current/userInfo', function(req, res){
 								else if (rows.length >=1 ) {
 									req.session.user.currentAlbumIndex = x + limit-1;
 
-									console.log('If admin');
+									//console.log('If admin');
 
 									req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
 									console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
@@ -79,7 +92,7 @@ router.post('/user/current/userInfo', function(req, res){
 								else if (rows.length >=1 ) {
 									req.session.user.currentAlbumIndex = x + limit - 1;
 
-									console.log('If not admin');
+									//console.log('If not admin');
 
 									req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
 									console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
@@ -178,7 +191,7 @@ router.post('/user/current/userInfo', function(req, res){
 						console.log('From LOGIN: Wrote info to client storage');
 					};
 					// Write to session
-					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true});
+					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum});
 					res.redirect('/admin')
 				} else {
 					console.log('From LOGIN: Username or Password does not match.');
@@ -188,6 +201,25 @@ router.post('/user/current/userInfo', function(req, res){
 		});
 	});
 	
+	router.post('/resource/getAlbum/:offset/:limit', function(req, res){
+		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.owner = "'+req.session.user.username+ 
+							'" LIMIT ' + req.params.limit + ' OFFSET ' + req.params.offset, 
+							function(err, rows, fields){
+								if (err) {
+									console.log('Err  From getAlbum:', err);
+									res.send(err);
+								} else {
+									if (rows.length == 0) {
+										res.send('Do not have album');
+									} else {
+										res.json( rows);
+										console.log('Get albums for admin okay. ', rows);
+									}
+								}
+							}
+						);
+	});
+
 	router.post('/admin/addAlbum', function(req, res){
 		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name = "'+ req.body.albumName+'"',
 			function(err, rows, fields){
@@ -220,24 +252,75 @@ router.post('/user/current/userInfo', function(req, res){
 			}
 		);
 	});
-router.get('/admin/login', function(req, res, next) {
-	res.type('text/html'); 
-	res.status(200); 
-	res.sendFile(publicPath + 'login.html');
-});
+	
+	router.post('/admin/saveChange', function(req, res){
+		console.log(req.body);
+		connection.query('UPDATE ALBUMS SET ALBUMS.name = "'+req.body.albumName+
+						'" WHERE ALBUMS.id = '+req.body.albumId,
+						function(err, rows, fields){
+							if (err) {
+								console.log('Error occurs:', err); 
+								res.send('<script>alert("error: '+JSON.stringify(err)+'")</script>')
+							} else {
+								console.log('Save successful!');
+								res.send('<script>alert("Change successful.")</script>')
+							}
+						}
+			);
+	});
 
-router.get('/admin/logout', function(req, res, next) {
-	if (req.session.user) {
-		req.session.user = null;
-	};
-	if (req.storage.user) {
-		req.storage.user = null;
-	};
-	res.redirect('/admin');
-});
+	router.post('/admin/deleteAlbum', function(req, res){
+		connection.query('DELETE FROM ALBUMS WHERE ALBUMS.id = "'
+						+req.body.albumId+'"',
+						function(err, rows, fields){
+							if (err) {
+								console.log('Error: ', err);
+								res.send(err);
+							} else {
+								console.log('Delete successful!');
+								res.send('Success!');
+							}
+						}
+		);
+	});
+
+	router.post('/admin/search', function(req, res){
+		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name REGEXP "[[:<:]]'+req.body.search+'[[:>:]]"',
+			function(err, rows, fields){
+				if (err) {
+					console.log('Search failed because of: ', err);
+					res.send(err);
+				} else {
+					if (rows.length <= 0) {
+						console.log('Search result has no record.');
+						res.send('Search result has no record');
+					} else {
+						console.log('Search result: ', rows);
+						res.json({rows: rows});
+					}
+				}
+			}
+		);
+	});
+
+	router.get('/admin/login', function(req, res, next) {
+		res.type('text/html'); 
+		res.status(200); 
+		res.sendFile(publicPath + 'login.html');
+	});
+
+	router.get('/admin/logout', function(req, res, next) {
+		if (req.session.user) {
+			req.session.user = null;
+		};
+		if (req.storage.user) {
+			req.storage.user = null;
+		};
+		res.redirect('/admin');
+	});
 
 
-router.get('/error', function(req, res){
-	res.sendFile(publicPath + 'error.html');
-});
+	router.get('/error', function(req, res){
+		res.sendFile(publicPath + 'error.html');
+	});
 module.exports = router;
