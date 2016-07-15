@@ -3,6 +3,7 @@ var cookieParser = require('cookie-parser');
 var mysql = require('mysql');
 var Q = require('q');
 var User = require('./users.js');
+var fs = require('fs');
 
 var router = express.Router();
 var publicPath = __dirname.slice(0,__dirname.length-6) + "public/";
@@ -19,20 +20,6 @@ connection.connect();
 
 // Get USER INFO at the moment
 router.post('/user/current/userInfo', function(req, res){
-	console.log(JSON.stringify(req.session.user));
-	// connection.query('SELECT * FROM USERS WHERE USERS.name = "'+req.session.user.username+'"',
-	// 	function(err, rows, fields){
-	// 		if (err) {
-	// 			console.log("Error From getUserInfo:", err);
-	// 			res.send(err);
-	// 		} else {
-	// 			if (rows.length == 1) {
-	// 				req.session.user.total = rows[0].numberOfAlbum;
-					
-	// 			}
-	// 		}
-	// 	}
-	// );
 	res.json(JSON.stringify(req.session.user||user));				
 });
 
@@ -51,19 +38,18 @@ router.post('/user/current/userInfo', function(req, res){
 	//  For NOT admin user: ALBUM LOAD USING AJAX
 	router.post('/resource/get8Album/:currentAlbumIndex/:limit', function(req, res){
 		var x = parseInt(req.params.currentAlbumIndex);
-		var albumIndex = x -1;
+		var albumIndex = x - 1;
 		var limit = parseInt(req.params.limit);
 		console.log(limit);
 
 		connection.query(
-				'SELECT PHOTOS.name as coverName, ALBUMS.name as albumName, ALBUMS.id, ALBUMS.createAt, ALBUMS.numberOfPhoto '+
-				'FROM PHOTOS '+
-				'RIGHT JOIN ALBUMS ON ALBUMS.name = PHOTOS.album '+
-				'GROUP BY albumName '+
-				'LIMIT ' + limit +
-				' OFFSET ' + albumIndex, 
+				'SELECT * FROM '+
+					'(SELECT PHOTOS.name as coverName, PHOTOS.album as albumName FROM PHOTOS ORDER BY RAND()) as T ' +
+				'RIGHT JOIN ALBUMS ON ALBUMS.name = T.albumName GROUP BY albumName '+ 
+				'LIMIT '+ limit + ' OFFSET ' + albumIndex,
 				
 			function(err, rows, fields){
+				console.log(rows);
 				if (err) { console.log(err)}
 				else {
 					if (rows.length == 0) {
@@ -82,7 +68,7 @@ router.post('/user/current/userInfo', function(req, res){
 									req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
 									console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
 									res.json({ data:rows , user:req.session.user});
-									console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
+									//console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
 									console.log('Get-all-album: Okay, albums are sent.')
 								};
 							});
@@ -97,7 +83,7 @@ router.post('/user/current/userInfo', function(req, res){
 									req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
 									console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
 									res.json({ data:rows , user:req.session.user});
-									console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
+									//console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
 									console.log('Get-all-album: Okay, albums are sent.')
 								};
 							});
@@ -127,7 +113,7 @@ router.post('/user/current/userInfo', function(req, res){
 
 				if (err) { console.log(" Loading photo error: ", err)}
 				else {
-					console.log(rows);
+					//console.log(rows);
 					if (rows.length == 0) {
 						console.log('Not have any photo. '); 
 						res.send('Do not have photo to load.')
@@ -152,14 +138,14 @@ router.post('/user/current/userInfo', function(req, res){
 			if (req.storage.user.remember) {
 				req.storage.user.location = '<strong><a href = "/"> &raquo; Home</a></strong>';
 				req.session.user = req.storage.user;
-				res.sendFile(publicPath + 'admin.html');
+				res.sendFile(publicPath + 'admin-albumlist.html');
 			} else {
 				res.redirect('/admin/login');
 			}
 		} else if (req.session.user) {
 			console.log('req.session.user = ', req.session.user);
 			if (req.session.user.logged) {
-				res.sendFile(publicPath + 'admin.html');
+				res.sendFile(publicPath + 'admin-albumlist.html');
 			} else {
 				res.redirect('/admin/login');
 			}
@@ -200,10 +186,21 @@ router.post('/user/current/userInfo', function(req, res){
 				}
 		});
 	});
+
+	router.get('/admin/album/:albumAlias', function(req, res){
+		var albumName = req.params.albumAlias.replace('-', ' ');
+		req.session.user.currentAlbumName = albumName;
+		req.session.user.location = '<strong><a href = "/admin"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
+		res.sendFile(publicPath + 'admin-albumdetail.html');
+	});
 	
-	router.post('/resource/getAlbum/:offset/:limit', function(req, res){
+	router.post('/resource/getAlbum/:offset/:limit/:sort', function(req, res){
+		if (!req.session.user.sort) { req.session.user.sort = {orderBy:'numberOfPhoto', by: 'ASC'}};
+		var order = JSON.parse(req.params.sort);
+		console.log(order);
+		if (typeof(order)=='undefined') {order = req.session.user.sort} else { req.session.user.sort = order}
 		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.owner = "'+req.session.user.username+ 
-							'" LIMIT ' + req.params.limit + ' OFFSET ' + req.params.offset, 
+							'" ORDER BY '+order.sortBy+' '+order.by+' LIMIT ' + req.params.limit + ' OFFSET ' + req.params.offset, 
 							function(err, rows, fields){
 								if (err) {
 									console.log('Err  From getAlbum:', err);
@@ -220,12 +217,29 @@ router.post('/user/current/userInfo', function(req, res){
 						);
 	});
 
+	router.post('/admin/getPhoto/:album/:offset', function(req, res){
+		var album = req.params.album;
+		var offset = parseInt(req.params.offset);
+		connection.query('SELECT * FROM PHOTOS WHERE PHOTOS.album = "'+album+'" LIMIT 8 OFFSET ' + offset,
+			function(err, rows, fields){
+				if (err) { console.log(err); res.send(err)}
+				else {
+					console.log("get photos: ", rows);
+					if (rows.length == 0 ) {console.log('Have no photo more'); res.send(rows)}
+					else {
+						res.send(rows);
+					}
+				}
+			}
+		);
+	});
+
 	router.post('/admin/addAlbum', function(req, res){
 		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name = "'+ req.body.albumName+'"',
 			function(err, rows, fields){
 				if (err) { console.log(err); res.send(err)}
 				else if (rows.length >= 1) {
-					res.send('<script>alert("New album name existed. Please pick another one.")</script>');
+					res.send('<script>alert("New album name existed. Please pick another one."); window.location.href = "/admin";</script>');
 				} else if (rows.length == 0) {
 					connection.query('INSERT INTO ALBUMS (name, numberOfPhoto, owner) '+
 									'VALUES ("'+ req.body.albumName+'", 0, "'+req.session.user.username+'");'+
@@ -242,7 +256,13 @@ router.post('/user/current/userInfo', function(req, res){
 																	, function(err3, rows3, fields3){
 																		if (err3) { res.send(err3)}
 																		else {
-																			res.send('<script>alert("Add album '+req.body.albumName+' success."); window.location.href = "/admin"</script>');
+																			fs.mkdir(publicPath + 'images/allalbum/' + req.body.albumName, function(err){
+																				if (err) {res.send(err); console.log(err)}
+																				else {
+																					console.log('created album folder');
+																					res.send('<script>alert("Add album '+req.body.albumName+' success."); window.location.href = "/admin"</script>');
+																				}
+																			})
 																		}
 												});
 											};
@@ -252,21 +272,90 @@ router.post('/user/current/userInfo', function(req, res){
 			}
 		);
 	});
+
+	router.post('/admin/photo/upload', function(req, res){
+		
+		var batch = req.body;
+		var rawBin = batch.bin.replace(/^data:image\/png;base64,/, "");
+		fs.writeFile(publicPath + 'images/allalbum/' + req.session.user.currentAlbumName +'/' + batch.filename, rawBin, 'base64', function(err){
+			if (err) { console.log(err); res.send(err)}
+			else {
+				console.log('Okay upload success!');
+				connection.query(	'INSERT INTO PHOTOS (name, photoPath, album, author) '+
+									'VALUES ("'+batch.filename+'","/allalbum/'+req.session.user.currentAlbumName+'/","'+req.session.user.currentAlbumName+'", "'+req.session.user.username+'") ',
+									function(err, rows, fields){
+										if (err) {res.send(err);console.log(err)}
+										else {
+											connection.query( 	'UPDATE ALBUMS '+
+																'SET ALBUMS.numberOfPhoto = ALBUMS.numberOfPhoto + 1 ' +
+																'WHERE ALBUMS.name = "'+req.session.user.currentAlbumName+'"',
+																function(err, rows, fields){
+																	console.log('Update database success!');
+																	res.send('perfect');
+																}
+															);
+										}
+									}
+				);
+			}
+		});
+	});
 	
-	router.post('/admin/saveChange', function(req, res){
-		console.log(req.body);
-		connection.query('UPDATE ALBUMS SET ALBUMS.name = "'+req.body.albumName+
-						'" WHERE ALBUMS.id = '+req.body.albumId,
-						function(err, rows, fields){
-							if (err) {
-								console.log('Error occurs:', err); 
-								res.send('<script>alert("error: '+JSON.stringify(err)+'")</script>')
-							} else {
-								console.log('Save successful!');
-								res.send('<script>alert("Change successful.")</script>')
+	router.post('/admin/photo/delete', function(req, res){
+		connection.query(	'DELETE FROM PHOTOS '+
+							'WHERE PHOTOS.name =  "'+req.body.photoname+'"',
+							function(err, rows, fields){
+								if (err) {console.log(err); res.send(err)}
+								else {
+									console.log('Deleted from PHOTOS');
+									connection.query(	'UPDATE ALBUMS SET numberOfPhoto = numberOfPhoto - 1 ' + 
+														'WHERE name = "'+req.session.user.currentAlbumName+'"',
+														function(err, rows, fields){
+															if (err) {console.log(err); res.send(err)}
+															else {
+																console.log('Updated Album');
+																fs.unlink(publicPath + 'images/allalbum/'+req.session.user.currentAlbumName+ '/' + req.body.photoname, function(err){
+																	if (err) {console.log(err); res.send(err)}
+																	else {
+																		console.log('Deleted file.');
+																		res.send('okay');
+																	}
+																})
+															}
+														}
+									);
+								}
 							}
-						}
-			);
+		);
+	});
+
+	router.post('/admin/saveChange', function(req, res){
+		connection.query('SELECT ALBUMS.name FROM ALBUMS WHERE id = '+req.body.albumId,
+			function(err0, rows0, fields0){
+				if (err0) {console.log(err0); res.send(err0)}
+				else {
+					connection.query('UPDATE ALBUMS SET ALBUMS.name = "'+req.body.albumName+
+									'" WHERE ALBUMS.id = '+req.body.albumId,
+									function(err, rows, fields){
+										if (err) {
+											console.log('Error occurs:', err); 
+											res.send('<script>alert("error: '+JSON.stringify(err)+'")</script>')
+										} else {
+											console.log('Save successful!');
+											fs.rename(publicPath + 'images/allalbum/' + rows0[0].name, publicPath + 'images/allalbum/' + req.body.albumName, 
+												function(err){
+													if (err) {console.log('change folder name failed.')}
+													else {
+														res.send('<script>alert("Change successful.")</script>');
+													}
+											});
+										}
+									}
+						);
+					
+				}
+			}
+		);
 	});
 
 	router.post('/admin/deleteAlbum', function(req, res){
@@ -277,8 +366,24 @@ router.post('/user/current/userInfo', function(req, res){
 								console.log('Error: ', err);
 								res.send(err);
 							} else {
-								console.log('Delete successful!');
-								res.send('Success!');
+								req.session.user.numberOfAlbum>=1?req.session.user.numberOfAlbum--:req.session.user.numberOfAlbum;
+								connection.query('UPDATE USERS SET USERS.numberOfAlbum = '+(req.session.user.numberOfAlbum-1)+ ' WHERE USERS.name = "'+ req.session.user.username+'"',
+									function(err, rows, fields){
+										if (err) {
+											console.log(err);
+											res.send(err);
+										} else {
+											console.log('Delete successful!');
+											fs.rmdir(publicPath + 'images/allalbum/' + req.body.albumName , function(err){
+												if (err) { res.send(err); console.log(err)}
+												else {
+													console.log('Deleted Album folder.');
+													res.send('Success!');
+												}
+											});
+										}
+									}
+								);
 							}
 						}
 		);

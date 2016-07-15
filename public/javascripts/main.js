@@ -2,9 +2,11 @@ $(document).ready(function(){
 	$.fn.popup = function(){
 		html = 	'<div id = "pop-up-bounder">'+ '<div class = "pop-up-image">' +
 					'<img id = "pop-up-image" src = "'+$(this).find('a').find('img').prop('src')+'"></img>'+
-					'<img class = "button-close" src = "../images/close.png"></img>'+
+					'<img class = "button-close" src = "/images/close.png"></img>'+
 					'</div>'+
 				'</div>';
+		
+		$(document).children('#pup-up-bounder').remove();
 		if ($(document).children('#pup-up-bounder').length == 0) {
 			$(this).parents('body').append(html);
 				
@@ -31,8 +33,9 @@ $(document).ready(function(){
 		if (total % limit != 0) {numberOfPage++}; // take the remaining needed page
 
 		var changePage = function(from, to){
-			getdata(from-1, 10);
-			$('#'+id).remove();
+			getdata(from-1, 10, {sortBy: 'default', by: 'ASC'}).then(function(){
+				$('#'+id).remove();
+			});
 		};
 
 		var listpage = "";
@@ -44,9 +47,7 @@ $(document).ready(function(){
 		}
 
 		var html = '<div id = "'+id+'" class = "pagination margin-standard">'+
-						'<li class = "page"><a href = "javascript:void(0)" data-from = "'+0+'" data-to = "'+((limit>albumlist.length)?albumlist.length:limit)+'">Lastest</a></li>' +
 							listpage +
-						'<li class = "page"><a href = "javascript:void(0)" data-from = "'+(parseInt(albumlist.length/limit)*limit+1)+'" data-to = "'+albumlist.length+'">Oldest</a></li>' +
 					'</div>';
 		$(this).parents(where).append(html);
 		

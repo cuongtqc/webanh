@@ -9,8 +9,8 @@ var app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: false })); // support encoded bodies
+app.use(bodyParser.json({limit: '50mb'})); // support json encoded bodies
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true})); // support encoded bodies
 app.use(express.static(path.join(__dirname, 'public')));
 //app.use(cookieParser());
 

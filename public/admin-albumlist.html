@@ -16,7 +16,7 @@
 				<!-- Display navigation link -->
 				<img src="images/logo-icon.jpg" class = "logo-image left" alt="no-logo">
 				<location class = "navigation left">
-					<a href = "#" id = "navigation">Home</a>
+					<!-- <a href = "#" id = "navigation">Home</a> -->
 				</location>
 				<!-- Display user action: logout -->
 				<div class = "user-action right">
@@ -61,11 +61,11 @@
 						<table class = "container">
 							<thead>
 								<tr class = "container">
-									<th id = "thead-number" class = "col-5"><div class = "button-classic">#</div></th>
-									<th id = "thead-title" class = "col-40"><div class = "button-classic">Title</div></th>
-									<th id = "thead-timestamp" class = "col-20"><div class = "button-classic">Created at</div></th>
-									<th id = "thead-numberOfPhoto" class = "col-5"><div class = "button-classic">No.</div></th>
-									<th id = "thead-action" class = "col-30"><div class = "button-classic">Action</div></th>
+									<th id = "thead-number" class = "col-5" data-direction = "1"><div class = "button-classic">#</div></th>
+									<th id = "thead-title" class = "col-40" data-direction = "1" data-sort = "name"><div class = "button-classic">Title</div></th>
+									<th id = "thead-timestamp" class = "col-20" data-direction = "1" data-sort = "createAt"><div class = "button-classic">Created at</div></th>
+									<th id = "thead-numberOfPhoto" class = "col-5" data-direction = "1" data-sort = "numberOfPhoto"><div class = "button-classic">No.</div></th>
+									<th id = "thead-action" class = "col-30" data-direction = "1"><div class = "button-classic">Action</div></th>
 								</tr>
 							</thead>
 							<tbody id = "album-list">

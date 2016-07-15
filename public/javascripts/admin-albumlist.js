@@ -4,8 +4,9 @@ $(document).ready(function(){
 	var user = {}; //Storage user data 
 	var backup = {}; //Backup prestage
 	var albumData = [];
+	backup.order = {sortBy: 'numberOfPhoto', by: 'ASC'}
 
-	user.location = '<strong>Home </strong>';
+	user.location = '<strong><a href = "/admin">Home</a> >> Album list</strong>';
 	user.currentAlbumIndex = 1;// init value
 
 	function updateUserLocation(){
@@ -19,6 +20,7 @@ $(document).ready(function(){
 			url: '/user/current/userInfo',
 			success: function(data){
 				user = JSON.parse(data);
+				user.location = '<strong><a href = "/admin">Home</a> >> Album list</strong>';
 				console.log(user)
 				updateUserLocation();
 			},
@@ -28,27 +30,38 @@ $(document).ready(function(){
 		});
 		return promise;
 	}
+	getUserState();
 
 	// This function use offset and limit as argument, then return rows of albums.
-	function getAlbum(offset, limit){
+	// offset: number, limit: number, order: {name:'name', use:'DESC'}
+	function getAlbum(offset, limit, order){
+		backup.offset = offset;
+		backup.limit = limit;
+		backup.order = backup.order||order;
 		var limit = typeof limit !== 'undefined' ?  limit : 8;
+		if (typeof(order) == 'undefined') {
+			order = backup.order;
+		}
+		console.log(order);
+		//order = typeof order !== 'undefined' ? order: {sortBy:'numberOfPhoto', by: 'ASC'};
 		var promise = $.ajax({
 			type: 'POST',
-			url: '/resource/getAlbum/' + offset + '/' + limit,
+			url: '/resource/getAlbum/' + offset + '/' + limit + '/' + JSON.stringify(order),
 			success: function(data){
 				console.log('From getAlbums: ' + data);
 				var html = "";
 				var hidden = "";
 
 				for (var i = 0; i < data.length; i++) {
+					var timestring = new Date(data[i].createAt).toLocaleString();
 					var albumAlias = data[i].name.replace(' ', '-');
 					var highlight = ((i+1)%2 != 0)?' class = "highlight" ': "";
 					html = html + 	'<tr id = "album-' +data[i].id+ '" '+ hidden + highlight+ ' data-id="'+data[i].id+'">' +
 										'<div class = "clear-both"></div>' +
 										'<td id = "counter">'+ (i+1) +'</td>' +
 										'<td id = "albumName">'+ data[i].name +'</td>' +
-										'<td id = "timestamp">'+ data[i].createAt +'</td>' +
-										'<td id = "number-of-photo">'+ data[i].numberOfPhoto +'</td>' +
+										'<td id = "timestamp">'+ timestring +'</td>' +
+										'<td id = "number-of-photo"><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data[i].numberOfPhoto +'<a></td>' +
 										'<td>'+
 											'<a href = "javascript:void(0)"><div id = "edit" class = "button-primary button-small left">Edit</div></a>'+
 											'<a href = "javascript:void(0)"><div id = "delete" class = "button-danger button-small right">Delete</div></a>'+
@@ -64,46 +77,62 @@ $(document).ready(function(){
 		}).then(function(){
 			getUserState().then(function(){
 				console.log('NUMBER OF ALBUMS:' + user.numberOfAlbum);
-				$('table').generatePagination('fieldset > .margin-standard', 10, "pagination", user.numberOfAlbum, getAlbum);
-			});
-			$('#album-list').on('click', '#edit', function(){
-				//Go to edit mode
-				console.log('Going to Edit mode...');
-				backup.thisNode = $(this).parent().parent();
-				var temp = mode({mode: 'edit', node: backup.thisNode});
-			});
-			$('#album-list').on('click', '#cancel', function(){
-				//Go to cancel change
-				console.log('Going to cancel change...');
-				mode({mode: 'cancel', node: backup.thisNode});
-			});
-			$('#album-list').on('click', '#save',function(){
-				//Go to save change
-				console.log('Going to save change...');
-				var temp2 = mode({mode: 'normal', node: backup.thisNode});
-				if (!$(temp2.input).val().replace(/\s/g, '').length) {
-					alert('Warning: Album name is only contained spaces.' + $(temp2.input).val().length);
-				} else {
-					//alert($(backup.input).val());
-					console.log('Warning: Album name is only contained spaces.' + $(temp2.input).val().length);
-					saveChange({albumId: temp2.currentAlbumId, albumName:$(backup.input).val()});
-				}
-			});
-			$('#album-list').on('click', '#delete', function(){
-				//do something after click delete button
-				console.log('Going to Delete this...');
-				var currentAlbumName = $(this).parent().parent().parent().find('#albumName').text();
-				var currentAlbumId = $(this).parent().parent().parent().data('id');
-				if (confirm('Do you really want to delete album: '+currentAlbumName+ ' ?')){
-					deleteAlbum(currentAlbumId);
-				}
+				$('#pagination').remove();
+				$('table').generatePagination('fieldset > .margin-standard', 10, "pagination", user.numberOfAlbum, function(from, to){ return getAlbum(from, to)});
+			})
+		});
+		return promise;
+	}
+
+	getAlbum(0, 10, backup.order);
+
+	// Set click event for buttons sort
+		$('thead>tr').on('click', 'th', function(){
+			backup.order = {};
+			var self = this;
+			backup.order.sortBy = $(this).data('sort');
+			backup.order.by = $(this).data('direction')==1?'ASC':'DESC';
+			getAlbum(backup.offset, backup.limit, backup.order).then(function(){
+				var temp = parseInt($(self).data('direction'))*-1;
+				$(self).data('direction', temp);
 			});
 
 		});
-	}
 
-	getAlbum(0, 10);
-
+	// Set click event for buttons: cancel save edit delete
+		$('#album-list').on('click', '#edit', function(){
+			//Go to edit mode
+			console.log('Going to Edit mode...');
+			backup.thisNode = $(this).parent().parent();
+			var temp = mode({mode: 'edit', node: backup.thisNode});
+		});
+		$('#album-list').on('click', '#cancel', function(){
+			//Go to cancel change
+			console.log('Going to cancel change...');
+			backup.thisNode = $(this).parent().parent();
+			mode({mode: 'cancel', node: backup.thisNode});
+		});
+		$('#album-list').on('click', '#save',function(){
+			//Go to save change
+			console.log('Going to save change...');
+			backup.thisNode = $(this).parent().parent();
+			var temp2 = mode({mode: 'normal', node: backup.thisNode});
+			if (!$(temp2.input).val().replace(/\s/g, '').length) {
+				alert('Warning: Album name is only contained spaces.' + $(temp2.input).val().length);
+			} else {
+				console.log('Warning: Album name is only contained spaces.' + $(temp2.input).val().length);
+				saveChange({albumId: temp2.currentAlbumId, albumName:$(backup.input).val()});
+			}
+		});
+		$('#album-list').on('click', '#delete', function(){
+			//do something after click delete button
+			console.log('Going to Delete this...');
+			var currentAlbumName = $(this).parent().parent().parent().find('#albumName').text();
+			var currentAlbumId = $(this).parent().parent().parent().data('id');
+			if (confirm('Do you really want to delete album: '+currentAlbumName+ ' ?')){
+				deleteAlbum(currentAlbumId);
+			}
+		});
 
 	
 	$('#search-content').keypress(function(e){
@@ -132,14 +161,13 @@ $(document).ready(function(){
 					var hidden = '';
 					console.log(data.rows.length);
 					for (var i = 0; i < data.rows.length; i++) {
-						//var albumAlias = data[i].albumName.replace(' ', '-');
-						//var highlight = ((i+1)%2 != 0)?' class = "highlight" ': "";
+						var albumAlias = data.rows[i].name.replace(' ', '-');
 						html = html + 	'<tr id = "album-' + data.rows[i].id + '" ' + hidden + ' data-id="'+ data.rows[i].id+'">' +
 											'<div class = "clear-both"></div>' +
 											'<td id = "counter">'+ (i+1) +'</td>' +
 											'<td id = "albumName">'+ data.rows[i].name +'</td>' +
 											'<td id = "timestamp">'+ data.rows[i].createAt +'</td>' +
-											'<td id = "number-of-photo">'+ data.rows[i].numberOfPhoto +'</td>' +
+											'<td id = "number-of-photo"><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data.rows[i].numberOfPhoto +'<a></td>' +
 											'<td>'+
 												'<a href = "javascript:void(0)"><div id = "edit" class = "button-primary button-small left">Edit</div></a>'+
 												'<a href = "javascript:void(0)"><div id = "delete" class = "button-danger button-small right">Delete</div></a>'+
@@ -189,19 +217,26 @@ $(document).ready(function(){
 			success: function(result){
 				alert('Delete successfully!');
 				$('#album-'+id).remove();
-				$("tr:visible+tr:hidden").slideToggle("fast"); 
-				$('table').parent().parent().find('#pagination').remove();
-				$('table').generatePagination('fieldset > .margin-standard', 10, "pagination");
-				var trlist = $('table > tbody').find('tr');
-				for( i = 0; i < trlist.length; i++){
-					$(trlist[i]).find('#counter').text((i+1));
-				}
+				if ($('#album-list').find('tr').length <= 0) {
+					window.location.href = '/admin';
+				} else {
+					$("tr:visible+tr:hidden").slideToggle("fast"); 
+					$('table').parent().parent().find('#pagination').remove();
+					$('table').generatePagination('fieldset > .margin-standard', 10, "pagination");
+					var trlist = $('table > tbody').find('tr');
+					for( i = 0; i < trlist.length; i++){
+						$(trlist[i]).find('#counter').text((i+1));
+					}
+				};
 				//return promise;
 			},
 			error: function(err){
 				alert('Cannot delete this album because of errors: '+ JSON.stringify(err));
 				//return promise;
 			}
+		});
+		promise.then(function(){
+			return	 getUserState();
 		});
 		return promise;
 	}
@@ -216,9 +251,12 @@ $(document).ready(function(){
 		
 		if (option.mode == 'edit') {			
 			option.node.parent().find('#albumName').html(input);
+			option.node.parent().find('#albumName').val(option.node.parent().find('#albumName').find('input').val());
 			//Change text of button to 'save' and 'cancel'
 			option.node.find('#edit').text('Save').removeClass('button-primary').addClass('button-inter').prop('id', 'save');
 			option.node.find('#delete').text('Cancel').removeClass('button-danger').addClass('button-warning').prop('id','cancel');
+			// Disable all other rows: this is alternative method.
+
 			
 		} else if (option.mode == 'normal') {
 			option.node.parent().find('#albumName').text($(input).val());
@@ -228,7 +266,8 @@ $(document).ready(function(){
 			option.node.find('#cancel').text('Delete').removeClass('button-warning').addClass('button-danger').prop('id','delete');	
 
 		} else if (option.mode == 'cancel') {
-			option.node.parent().find('#albumName').text(backup.currentAlbumName);
+			console.log(option.node.parent());
+			option.node.parent().find('#albumName').text(option.node.parent().find('#albumName').val());
 			option.node.parent().find('input').remove();
 			option.node.find('#save').text('Edit').removeClass('button-inter').addClass('button-primary').prop('id', 'edit');
 			option.node.find('#cancel').text('Delete').removeClass('button-warning').addClass('button-danger').prop('id','delete');	
