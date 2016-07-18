@@ -6,7 +6,7 @@ $(document).ready(function(){
 	var albumData = [];
 	backup.order = {sortBy: 'numberOfPhoto', by: 'ASC'}
 
-	user.location = '<strong><a href = "/admin">Home</a> >> Album list</strong>';
+	//user.location = '<strong><a href = "/admin">Home</a> >> Album list</strong>';
 	user.currentAlbumIndex = 1;// init value
 
 	function updateUserLocation(){
@@ -20,7 +20,7 @@ $(document).ready(function(){
 			url: '/user/current/userInfo',
 			success: function(data){
 				user = JSON.parse(data);
-				user.location = '<strong><a href = "/admin">Home</a> >> Album list</strong>';
+				//user.location = '<strong><a href = "/admin">Home</a> >> Album list</strong>';
 				console.log(user)
 				updateUserLocation();
 			},
@@ -130,7 +130,7 @@ $(document).ready(function(){
 			var currentAlbumName = $(this).parent().parent().parent().find('#albumName').text();
 			var currentAlbumId = $(this).parent().parent().parent().data('id');
 			if (confirm('Do you really want to delete album: '+currentAlbumName+ ' ?')){
-				deleteAlbum(currentAlbumId);
+				deleteAlbum(currentAlbumId, currentAlbumName);
 			}
 		});
 
@@ -209,11 +209,11 @@ $(document).ready(function(){
 		return promise;
 	}
 
-	function deleteAlbum(id){
+	function deleteAlbum(id, name){
 		var promise = $.ajax({
 			type: 'POST',
 			url: '/admin/deleteAlbum',
-			data: {albumId: id},
+			data: {albumId: id, albumName: name},
 			success: function(result){
 				alert('Delete successfully!');
 				$('#album-'+id).remove();

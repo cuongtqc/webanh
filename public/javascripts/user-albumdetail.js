@@ -45,7 +45,7 @@ $(document).ready(function(){
 					html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
 									'<div class = "album-thumb">'+
 										'<a><img id = "album-thumb'+data[i].id+
-										'" src="../images/allalbum/'+temp+
+										'" src="../images'+data[i].photoPath+temp+
 										'" alt="no-image" title = "Image">'+
 										'</a>'+
 										'<div id = "toggle"><strong>'+data[i].createdAt+'</strong></div>'+

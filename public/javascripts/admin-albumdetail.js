@@ -108,7 +108,7 @@ $(document).ready(function(){
 		$('#file').trigger('click');
 	})
 	$('#file').change(function(){
-		var fileName = $(this).val().substr(12, $(this).val().length);
+		var fileName = $(this).val();//.substr(12, $(this).val().length);
 		$('#file-info').html(fileName);
 	});
 	$('#add-photo').click(function(){

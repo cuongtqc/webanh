@@ -136,7 +136,7 @@ router.post('/user/current/userInfo', function(req, res){
 		if (req.storage.user) {
 			console.log('req.storage.user = ', req.storage.user);
 			if (req.storage.user.remember) {
-				req.storage.user.location = '<strong><a href = "/"> &raquo; Home</a></strong>';
+				req.storage.user.location = '<strong> &raquo; Home</strong>';
 				req.session.user = req.storage.user;
 				res.sendFile(publicPath + 'admin-albumlist.html');
 			} else {
@@ -145,6 +145,7 @@ router.post('/user/current/userInfo', function(req, res){
 		} else if (req.session.user) {
 			console.log('req.session.user = ', req.session.user);
 			if (req.session.user.logged) {
+				req.session.user.location = '<strong> &raquo; Home</strong>';
 				res.sendFile(publicPath + 'admin-albumlist.html');
 			} else {
 				res.redirect('/admin/login');
@@ -177,7 +178,7 @@ router.post('/user/current/userInfo', function(req, res){
 						console.log('From LOGIN: Wrote info to client storage');
 					};
 					// Write to session
-					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum});
+					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, location:'<strong><a href = "/"> &raquo; Home</a></strong>'});
 					res.redirect('/admin')
 				} else {
 					console.log('From LOGIN: Username or Password does not match.');
@@ -373,14 +374,21 @@ router.post('/user/current/userInfo', function(req, res){
 											console.log(err);
 											res.send(err);
 										} else {
-											console.log('Delete successful!');
-											fs.rmdir(publicPath + 'images/allalbum/' + req.body.albumName , function(err){
-												if (err) { res.send(err); console.log(err)}
+											connection.query('DELETE FROM PHOTOS WHERE PHOTOS.album = "' + req.body.albumName + '"', function(err, rows, fields){
+												if (err) { console.log(err); res.send(err)}
 												else {
-													console.log('Deleted Album folder.');
-													res.send('Success!');
+													console.log('Delete successful!');
+													deleteFolderRecursive(publicPath + 'images/allalbum/' + req.body.albumName , function(err){
+														if (err) { res.send(err); console.log(err)}
+														else {
+															console.log('Deleted Album folder.');
+															req.session.user.location = '<strong> &raquo; Home</strong>';
+															res.send(req.session.user);
+														}
+													});
 												}
 											});
+											
 										}
 									}
 								);
@@ -428,4 +436,20 @@ router.post('/user/current/userInfo', function(req, res){
 	router.get('/error', function(req, res){
 		res.sendFile(publicPath + 'error.html');
 	});
+
+	//http://www.geedew.com/remove-a-directory-that-is-not-empty-in-nodejs/
+	var deleteFolderRecursive = function(path, callback) {
+	  	if( fs.existsSync(path) ) {
+	    	fs.readdirSync(path).forEach(function(file,index){
+		      	var curPath = path + "/" + file;
+		      	if(fs.lstatSync(curPath).isDirectory()) { // recurse
+		        	deleteFolderRecursive(curPath);
+		      	} else { // delete file
+		        	fs.unlinkSync(curPath);
+		      	}
+	    	});
+	    	fs.rmdirSync(path);
+	 	}
+	 	return callback(null);
+	};
 module.exports = router;
