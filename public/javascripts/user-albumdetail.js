@@ -42,13 +42,14 @@ $(document).ready(function(){
 				var html = "";
 				for (var i = 0; i < data.length; i++) {
 					var temp = ($.type(data[i].name) == 'string')?data[i].name:'no-image.png';
+					var timestamp = new Date(data[i].createdAt).toLocaleString();
 					html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
 									'<div class = "album-thumb">'+
 										'<a><img id = "album-thumb'+data[i].id+
 										'" src="../images'+data[i].photoPath+temp+
 										'" alt="no-image" title = "Image">'+
 										'</a>'+
-										'<div id = "toggle"><strong>'+data[i].createdAt+'</strong></div>'+
+										'<div id = "toggle"><strong>'+timestamp+'</strong></div>'+
 									'</div>'+
 								'</div>';
 					if (data.length < 8 ) {
@@ -79,5 +80,6 @@ $(document).ready(function(){
 		$(this).parent().parent().remove();	
 	})
 	$('#show-more-photo').click(get8Photo);
+	$('body').toggle(400);
 
 });

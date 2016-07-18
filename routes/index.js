@@ -26,13 +26,13 @@ router.post('/user/current/userInfo', function(req, res){
 // For NOT admin user: HOME PAGE
 	router.get('/', function(req, res){
 		if (req.session.user) {
-			req.session.user.location = "<strong> &raquo; Home </strong>";
+			req.session.user.location = '<span id = "text-logo">WEBI</span><strong> &raquo; Home </strong>';
 		} else {
 			var user = new User({});
-			user.location = "<strong> &raquo; Home </strong>";
+			user.location = '<span id = "text-logo">WEBI</span><strong> &raquo; Home </strong>';
 			req.session.user = user;
 		};
-		res.sendFile(publicPath + 'user-albumlist.html');
+		res.render(publicPath + 'user-albumlist.jade');
 	});
 
 	//  For NOT admin user: ALBUM LOAD USING AJAX
@@ -98,9 +98,9 @@ router.post('/user/current/userInfo', function(req, res){
 	router.get('/album/:albumAlias', function(req, res){
 		var albumName = req.params.albumAlias.replace('-', ' ');
 		req.session.user.currentAlbumName = albumName;
-		req.session.user.location = '<strong><a href = "/"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
+		req.session.user.location = '<span id = "text-logo">WEBI</span><strong>&raquo; <a href = "/"> Home</a> &raquo; '+ albumName +'</strong>';
 		req.session.user.currentPhotoIndex = 1;
-		res.sendFile(publicPath + 'user-albumdetail.html');
+		res.render(publicPath + 'user-albumdetail.jade');
 	});
 
 	// For NOT admin user: LOAD PHOTO
@@ -120,7 +120,7 @@ router.post('/user/current/userInfo', function(req, res){
 					}
 					else {
 						req.session.user.currentPhotoIndex += 8;
-						req.session.user.location = '<strong> <a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
+						req.session.user.location = '<span id = "text-logo">WEBI</span><strong><a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
 						console.log(req.session.user.currentPhotoIndex);
 						res.json({ data:rows , user:req.session.user});
 						console.log('Get 8 Photo: Okay, Photos are sent.')
@@ -136,17 +136,17 @@ router.post('/user/current/userInfo', function(req, res){
 		if (req.storage.user) {
 			console.log('req.storage.user = ', req.storage.user);
 			if (req.storage.user.remember) {
-				req.storage.user.location = '<strong> &raquo; Home</strong>';
+				req.storage.user.location = '<span id = "text-logo">WEBI</span><strong> &raquo; Home</strong>';
 				req.session.user = req.storage.user;
-				res.sendFile(publicPath + 'admin-albumlist.html');
+				res.render(publicPath + 'admin-albumlist.jade', {user: req.session.user.username});
 			} else {
 				res.redirect('/admin/login');
 			}
 		} else if (req.session.user) {
 			console.log('req.session.user = ', req.session.user);
 			if (req.session.user.logged) {
-				req.session.user.location = '<strong> &raquo; Home</strong>';
-				res.sendFile(publicPath + 'admin-albumlist.html');
+				req.session.user.location = '<span id = "text-logo">WEBI</span><strong> &raquo; Home</strong>';
+				res.render(publicPath + 'admin-albumlist.jade', {user: req.session.user.username});
 			} else {
 				res.redirect('/admin/login');
 			}
@@ -178,7 +178,7 @@ router.post('/user/current/userInfo', function(req, res){
 						console.log('From LOGIN: Wrote info to client storage');
 					};
 					// Write to session
-					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, location:'<strong><a href = "/"> &raquo; Home</a></strong>'});
+					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, location:'<span id = "text-logo">WEBI</span><strong><a href = "/"> &raquo; Home</a></strong>'});
 					res.redirect('/admin')
 				} else {
 					console.log('From LOGIN: Username or Password does not match.');
@@ -191,8 +191,8 @@ router.post('/user/current/userInfo', function(req, res){
 	router.get('/admin/album/:albumAlias', function(req, res){
 		var albumName = req.params.albumAlias.replace('-', ' ');
 		req.session.user.currentAlbumName = albumName;
-		req.session.user.location = '<strong><a href = "/admin"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
-		res.sendFile(publicPath + 'admin-albumdetail.html');
+		req.session.user.location = '<span id = "text-logo">WEBI</span><strong><a href = "/admin"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
+		res.render(publicPath + 'admin-albumdetail.jade', {user: req.session.user.username});
 	});
 	
 	router.post('/resource/getAlbum/:offset/:limit/:sort', function(req, res){
@@ -342,13 +342,18 @@ router.post('/user/current/userInfo', function(req, res){
 											console.log('Error occurs:', err); 
 											res.send('<script>alert("error: '+JSON.stringify(err)+'")</script>')
 										} else {
-											console.log('Save successful!');
-											fs.rename(publicPath + 'images/allalbum/' + rows0[0].name, publicPath + 'images/allalbum/' + req.body.albumName, 
-												function(err){
-													if (err) {console.log('change folder name failed.')}
-													else {
-														res.send('<script>alert("Change successful.")</script>');
-													}
+											connection.query('UPDATE PHOTOS SET PHOTOS.photoPath = "/allalbum/'+req.body.albumName+'/" PHOTOS.album = "'+req.body.albumName+'" WHERE PHOTOS.album = "'+rows0[0].name+'"', function(err1, rows1, fields1){
+												if (err) { console.log(err1); res.send(err1)}
+												else {
+													console.log('Save successful!');
+													fs.rename(publicPath + 'images/allalbum/' + rows0[0].name, publicPath + 'images/allalbum/' + req.body.albumName, 
+														function(err2){
+															if (err2) {console.log('change folder name failed.')}
+															else {
+																res.send('<script>alert("Change successful.")</script>');
+															}
+													});
+												}
 											});
 										}
 									}
@@ -419,7 +424,7 @@ router.post('/user/current/userInfo', function(req, res){
 	router.get('/admin/login', function(req, res, next) {
 		res.type('text/html'); 
 		res.status(200); 
-		res.sendFile(publicPath + 'login.html');
+		res.render(publicPath + 'login.jade');
 	});
 
 	router.get('/admin/logout', function(req, res, next) {
@@ -434,7 +439,7 @@ router.post('/user/current/userInfo', function(req, res){
 
 
 	router.get('/error', function(req, res){
-		res.sendFile(publicPath + 'error.html');
+		res.render(publicPath + 'error.jade');
 	});
 
 	//http://www.geedew.com/remove-a-directory-that-is-not-empty-in-nodejs/

@@ -1,0 +1,60 @@
+html
+  head
+    title Admin
+    script(src='/javascripts/jquery-1.12.4.min.js', type='text/javascript')
+    script(src='/javascripts/main.js', type='text/javascript')
+    script(src='/javascripts/admin-albumlist.js', type='text/javascript')
+    link(rel='stylesheet', type='text/css', href='/stylesheets/reset.css')
+    link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
+  body
+    // Body
+    .container.padding-top
+      // Display navigation link
+      .location  
+        location#location.left
+          // <a href = "#" id = "navigation">Home</a>
+          // Display user action: logout
+        .right
+          span#username= user
+          a#logout(href='/admin/logout') Logout
+      .clear-both
+      // End header
+      // Main
+      .container.padding-standard
+        // Border with title
+        fieldset.main-container.min-height
+          legend.name-main-container-admin-albumlist Album list
+          // title
+          // List of album
+          .margin-standard
+            .margin-standard
+              // Create new album form
+              .container.left.col-50
+                form(action='/admin/addAlbum', method='POST')
+                  input.text-input.col-60(type='text', name='albumName', placeholder=' + Name of new album...', required='')
+                  input.text-input.col-30(type='submit', value='Add new Album')
+              // Album search box
+              .container.col-50.right
+                // <form id = "search" action = "/admin/search" method = "POST" accept-charset="utf-8">
+                input#search-content.text-input.col-70.right(type='text', name='search', placeholder='  Search album by name...', required='')
+                // </form>
+            .clear-both
+            // Show list of album using table
+            .margin-standard
+              table.container
+                thead
+                  tr.container
+                    th#thead-number.col-5(data-direction='1')
+                      .button-classic #
+                    th#thead-title.col-40(data-direction='1', data-sort='name')
+                      .button-classic Title
+                    th#thead-timestamp.col-20(data-direction='1', data-sort='createAt')
+                      .button-classic Created at
+                    th#thead-numberOfPhoto.col-5(data-direction='1', data-sort='numberOfPhoto')
+                      .button-classic No.
+                    th#thead-action.col-30(data-direction='1')
+                      .button-classic Action
+                tbody#album-list
+            // Pagination
+          // End list of album
+        // End border with title

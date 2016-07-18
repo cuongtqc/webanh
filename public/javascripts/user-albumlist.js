@@ -5,7 +5,7 @@ $(document).ready(function(){
 	user.currentAlbumIndex = 1;// init value
 
 	function updateUserLocation(){
-		$('#location').html(user.location);
+		$('.location').html(user.location);
 	}
 	// Get USER INFO at the moment
 	function getUserState(){
@@ -35,18 +35,19 @@ $(document).ready(function(){
 				updateUserLocation();
 				var data = result.data;
 				data = result.data;
-				console.log('From get8Albums: ' + data);
+				console.log('From get8Albums: ' + JSON.stringify(data));
 				var html = "";
 
 				for (var i = 0; i < data.length; i++) {
 					var temp = ($.type(data[i].coverName) == 'string')?data[i].coverName:'no-image.png';
 					var albumAlias = data[i].albumName.replace(' ', '-');
+					var timestamp = new Date(data[i].createAt).toLocaleString();
 					html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
 									'<div class = "album-thumb">'+
 										'<a href="/album/'+albumAlias+'"><img id = "album-thumb'+data[i].id+
 										'" src="images/allalbum/'+data[i].albumName+'/'+temp+
 										'" alt="no-image" title = "Image"></a>'+
-										'<div id = "toggle"><strong>'+data[i].createAt+'</strong></div>'+
+										'<div id = "toggle"><strong>'+ timestamp+'</strong></div>'+
 									'</div>'+
 									'<div class = "album-title">'+
 										'<span id = "album-title">'+data[i].albumName+'</span>'+
@@ -59,10 +60,10 @@ $(document).ready(function(){
 				$('#show-all-album').append(html);
 				// Mouse hover show date created infor with custom JQ plugin 
 				$('.album-thumb').on('mouseenter',function(){
-						$(this).toggleUp('0px',$(this).children('#toggle'));
+						 $(this).toggleUp('0px',$(this).children('#toggle'));
 				});
 				$('.album-thumb').on('mouseleave',function(){
-						$(this).toggleUp('-30px', $(this).children('#toggle'));
+						 $(this).toggleUp('-30px', $(this).children('#toggle'));
 				});
 			},
 			error: function(err){
@@ -74,6 +75,7 @@ $(document).ready(function(){
 	$('#show-more-album').click(function(){
 		get8Album(8);
 	});
+	$('body').toggle(400);
 	get8Album(8);
 
 });

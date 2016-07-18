@@ -7,7 +7,8 @@ var session = require('client-sessions');
 
 var app = express();
 
-app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, 'public'));
 
 app.use(bodyParser.json({limit: '50mb'})); // support json encoded bodies
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true})); // support encoded bodies

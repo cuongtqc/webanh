@@ -1,7 +1,14 @@
+/*Fonts*/
+	@font-face {
+	    font-family: play-fair;
+	    src: url('../fonts/Playfair.ttf');
+	}
+
 /*Tag implement*/
 	body {
-		background-image: url('../images/background.jpg'); 
+		background-color: #252839;
 		height: auto;
+		font-family: play-fair;
 	}
 
 	label {
@@ -30,17 +37,54 @@
 		color: white;
 	}
 
-	location {
-		display: block;
-		position: absolute;
-		top: 18px;
-		left: 230px;
+	#location {
+		/*position: relative;
+		top: 0px;
+		left: 0px;
+		height: 50px; 
+		width: auto;
+		padding: 0px 100px;
+		line-height: 50px;
+		background-color: #677077;
+		border-bottom: 1px solid  #b5b5b7;
+		box-shadow: 5px 0px 10px #b5b5b7;
+		color: #b5b5b7;*/
 	}
 
-	location > a {
-		text-decoration: none;
-		color: blue;
+	.location {
+		position: relative;
+		top: 0px;
+		left: 0px;
+		height: 50px; 
+		width: auto;
+		padding: 0px 100px;
+		line-height: 50px;
+		background-color: #677077;
+		border-bottom: 1px solid  #b5b5b7;
+		box-shadow: 5px 0px 10px #b5b5b7;
+		color: #b5b5b7;
+	}
 
+
+	#text-logo {
+		font-size: 40px;
+		text-transform: uppercase;
+		color: #b5b5b7;
+		margin-right: 20px;
+		text-shadow: 	0px 0px 0px white,
+						1px 0px 1px white,
+						2px 0px 1px white,
+						3px 0px 1px white,
+						4px 0px 1px white,
+						0px 0px 1px white,
+						0px 0px 1px white,
+						0px 0px 1px white;
+	}
+	#text-logo:hover {
+		transition-property: width, height;
+	    transition-duration: 1s;
+	    transition-timing-function: linear;
+	    transition-delay: 0.5s;
 	}
 
 /*Class implement*/
@@ -51,6 +95,10 @@
 
 	.text-input {
 		height: 30px;
+		border-radius: 0px;
+		padding: 0px 10px;
+		border: solid 1px #dcdcdc;
+		/*transition: box-shadow 0.3s, border 0.3s;*/
 	}
 
 	.clear-both {
@@ -112,23 +160,20 @@
 			text-decoration: none;
 		}
 		.main-container {
-			margin-top: 70px;
+			margin-top: 25px;
 			margin-right: 100px;
 			margin-left: 100px;
-			border: 2px solid green;
+			border: 1px solid #677077;
 			width: auto;
 			height: auto;
 			/*opacity: 0.7;*/
-			background-image: url('../images/albumlist-background.jpg');
+			background-color: #677077;
 			box-shadow: 1 1 2px black, 0 0 25px blue, 0 0 5px darkblue;	
 		}
 		.min-height {
 			min-height: 500px;
 		}
-		.name-main-container {
-			margin-left: 15px;
-			color: green;
-		}
+	
 		td > input {
 			height: 30px;
 			border-radius: 0px;
@@ -152,7 +197,7 @@
 				line-height: 20px;
 			}
 			.button-inter {
-				background-color: green;
+				background-color: #b5b5b7;
 				height: 20px;
 				width: 40%;
 				margin: 2.5% 5%;
@@ -196,7 +241,7 @@
 				border: none;
 				vertical-align: middle;
 				text-align: center;
-				background-color: #0066ff;
+				background-color: #b5b5b7;
 				margin-left: 40px;
 				color: white;
 			}
@@ -205,7 +250,7 @@
 				height: 100px;
 				width: 50%;
 				margin-left: 40px;
-				border: 1px solid green;
+				border: 1px solid #b5b5b7;
 				position: relative;
 				z-index: 9999;
 			}
@@ -216,7 +261,7 @@
 				line-height: 30px;
 				font-size: 14px;
 				border: none;
-				background-color: #00ff66;	
+				background-color: #f2b632;	
 			}
 			#fake-choose-file {
 				height: 30px;
@@ -224,7 +269,7 @@
 				font-size: 14px;
 				color: white;
 				text-align: center;
-				background-color: green;	
+				background-color: #b5b5b7;	
 				width: auto;
 				margin: 10px 12px;
 			}
@@ -234,7 +279,7 @@
 				height: 30px;
 				width: 50%;
 				right: 0px;
-				border: solid 1px green;
+				border: solid 1px #b5b5b7;
 				overflow: hidden;
 				word-wrap:break-word;
 			}
@@ -258,9 +303,9 @@
 				height: 27px;
 				line-height: 27px;
 				vertical-align: center;
-				border: 1px solid green;
+				border: 1px solid #b5b5b7;
 				border-radius: 20px;
-				color: green;
+				color: #b5b5b7;
 			}
 			.active {
 				background-color: #99ff66;
@@ -280,7 +325,7 @@
 			top: 0px;
 			width: auto;
 			height: 170px;
-			border: 1px solid green;
+			border: 1px solid #b5b5b7;
 			overflow: hidden;
 		}
 		[id *= "album-thumb"] {
@@ -289,16 +334,17 @@
 		}
 
 		.album-title {
-			/*display: block;*/
 			position: absolute;
-			margin-left: 20px;
-			margin-right: 20px;
 			bottom: 0px;
+			left: 50%;
+			transform: translateX(-50%);
 			width: auto; 
-			height: 30px;
-			line-height: 30px;
+			height: 26px;
+			padding: 0px 10px;
+			line-height: 28px;
+			background-color: white;
+			border-radius: 10px;
 			vertical-align: center;
-			/*text-overflow: ellipsis;*/
 		}
 
 		#album-title {
@@ -311,18 +357,24 @@
 		}
 
 		.main-container-user-albumlist {
-			margin-top: 50px;
+			margin-top: 25px;
 			margin-right: 100px;
 			margin-left: 100px;
 			padding-bottom: 25px;
 			margin-bottom: 20px;
-			border: 2px solid green;
+			border: 1px solid #b5b5b7;
+			box-shadow: 1px 1px 5px #b5b5b7;
 			width: auto;
 			height: auto;
 		}
-		.name-main-container-user-albumlist {
+		.name-main-container-user-albumlist , .name-main-container-admin-albumlist {
 			text-align: center;
-			color: green;
+			padding: 0px 10px;
+			line-height: 30px;
+			text-transform: uppercase;
+			background-color: white;
+			border-radius: 10px;
+			color: black;
 		}
 		.albumLink{
 			color: #0066ff;
@@ -352,36 +404,39 @@
 			margin: 10px 20px;
 		}
 		#pop-up-bounder {
-			position: absolute;
+			position: fixed;
 			background-color: rgba(81, 81, 101, 0.9);
 			width: 100%;
 			height: 100%;
+			min-height: 100%;
 			top: 0px;
 			left: 0px;
 			z-index: 9998;
 		}
 		#pop-up-image {
+			display: inline-block;
 			position: absolute;
-			width: 100%;
-			height: 500px;
-			max-height: 100%;
+			max-height: 90%;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
 			z-index: 9999;
 		}
-		.pop-up-image {
+		.pop-up-image-and-button {
 			position: relative;
-			width: 60%;
-			height: 90%;
-			max-height: 100%;
-			top: 10%;
-			left: 20%;
+			/*padding: 20px 20px;*/
+			width: auto;
+			height: 100%;
 			z-index: 9999;
 		}
 		.button-close {
+			display: inline-block;
 			position: absolute;
 			width: 40px;
 			height: auto;
-			top: -35px;
-			right: -35px;
+			top: 40px;
+			right: 40px;
+			/*transform: translate(-50%, -50%);*/
 			z-index: 10000;
 		}
 		#toggle {
@@ -393,6 +448,9 @@
 			border-top: 1px solid white;
 			color: white;
 		}
+		/*#toggle:hover{
+			transform: translate(0px,30px) 1s;
+		}*/
 		#toggle-background {
 			position: absolute;
 			width: 100%;
@@ -406,8 +464,8 @@
 		#toggle > strong {
 			display: block;
 			vertical-align: center;
-			font-size: 12px;
-			line-height: 13px;
+			font-size: 14px;
+			line-height: 14px;
 		}
 		.highlight {
 			background-color: #afafaf !important;

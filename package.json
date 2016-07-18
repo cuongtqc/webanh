@@ -11,6 +11,7 @@
     "body-parser": "*",
     "cookie-parser":"*",
     "q": "*",
-    "client-sessions": "*"
+    "client-sessions": "*",
+    "jade": "*"
   }
 }
