@@ -379,7 +379,7 @@ router.post('/user/current/userInfo', function(req, res){
 								res.send(err);
 							} else {
 								req.session.user.numberOfAlbum>=1?req.session.user.numberOfAlbum--:req.session.user.numberOfAlbum;
-								connection.query('UPDATE USERS SET USERS.numberOfAlbum = '+(req.session.user.numberOfAlbum-1)+ ' WHERE USERS.name = "'+ req.session.user.username+'"',
+								connection.query('UPDATE USERS SET USERS.numberOfAlbum = '+(req.session.user.numberOfAlbum)+ ' WHERE USERS.username = "'+ req.session.user.username+'"',
 									function(err, rows, fields){
 										if (err) {
 											console.log(err);

@@ -198,7 +198,7 @@ $(document).ready(function(){
 			url: '/admin/saveChange',
 			data: data,
 			success: function(result){
-				alert('Album change successfully!.');
+				$('body > .container').showNoti($('body > .container'), 'Album change successfully!');
 				backup.thisNode.parent().find('a.albumLink').prop('href', '/admin/album/'+data.albumName.replace(/\ /g, '-'));
 				//return promise;
 			},
@@ -216,7 +216,8 @@ $(document).ready(function(){
 			url: '/admin/deleteAlbum',
 			data: {albumId: id, albumName: name},
 			success: function(result){
-				alert('Delete successfully!');
+				//alert('Delete successfully!');
+				$('body > .container').showNoti($('body > .container'), 'Delete successfully!');
 				$('#album-'+id).remove();
 				if ($('#album-list').find('tr').length <= 0) {
 					window.location.href = '/admin';
@@ -232,7 +233,8 @@ $(document).ready(function(){
 				//return promise;
 			},
 			error: function(err){
-				alert('Cannot delete this album because of errors: '+ JSON.stringify(err));
+				//alert('Cannot delete this album because of errors: '+ JSON.stringify(err));
+				$('body > .container').showNoti($('body > .container'), 'Cannot delete this album because of errors: '+ JSON.stringify(err));
 				//return promise;
 			}
 		});

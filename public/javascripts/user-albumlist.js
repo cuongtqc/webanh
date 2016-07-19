@@ -77,14 +77,5 @@ $(document).ready(function(){
 	$('#show-more-album').click(function(){
 		get8Album(8);
 	});
-	//$('body').toggle(400);
 	get8Album(8);
-	// $('body > .container').showNoti($('body > .container'), 'Vai chuong the nhi');
-	// setTimeout(function(){
-	// 	$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
-	// }, 1000)
-	// setTimeout(function(){
-	// 	$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
-	// }, 2000)
-
 });

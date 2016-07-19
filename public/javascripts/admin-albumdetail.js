@@ -72,11 +72,13 @@ $(document).ready(function(){
 						data: {photoname: name},
 						success: function(data){
 							$('#album-boundary'+ id).remove();
-							alert('Delete file success.');
+							$('body > .container').showNoti($('body > .container'), 'Delete photo file success!');
+							//alert('Delete file success.');
 							
 						},
 						error: function(err){
-							alert('Delete file failed.');
+							$('body > .container').showNoti($('body > .container'), 'Delete photo file FAILED!');
+							//alert('Delete file failed.');
 						}
 					});
 				}
@@ -121,7 +123,8 @@ $(document).ready(function(){
     			url: '/admin/photo/upload',
     			data: batch,
     			success: function(data){
-    				alert('Okay. Uploaded!');
+    				$('body > .container').showNoti($('body > .container'), 'Okay. Uploaded!');
+    				//alert('Okay. Uploaded!');
     				getUserState(function(){});
     				window.location.href = window.location.href;
     			},

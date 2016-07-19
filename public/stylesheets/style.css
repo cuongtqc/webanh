@@ -1,14 +1,14 @@
 /*Fonts*/
 	@font-face {
-	    font-family: play-fair;
-	    src: url('../fonts/Playfair.ttf');
+	    font-family: helve;
+	    src: url('../fonts/helve.ttf');
 	}
 
 /*Tag implement*/
 	body {
 		background-color: #252839;
 		height: auto;
-		font-family: play-fair;
+		font-family: helve;
 	}
 
 	label {
@@ -479,7 +479,9 @@
 			opacity: 1;
 			text-align: center;
 			vertical-align: middle;
-			color: white;
+			color: red;
+			line-height: 30px;
+			text-shadow: 0px 1px 2px 2px white;
 		}
 		#notiBar {
 			position: fixed;
