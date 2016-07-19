@@ -23,6 +23,8 @@ $(document).ready(function(){
 		});
 	}
 
+	getUserState();
+
 	function get8Album(limit){
 		console.log('TESTING HERE');
 		var limit = typeof limit !== 'undefined' ?  limit : 8;
@@ -77,12 +79,12 @@ $(document).ready(function(){
 	});
 	//$('body').toggle(400);
 	get8Album(8);
-	$('body > .container').showNoti($('body > .container'), 'Vai chuong the nhi');
-	setTimeout(function(){
-		$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
-	}, 1000)
-	setTimeout(function(){
-		$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
-	}, 2000)
+	// $('body > .container').showNoti($('body > .container'), 'Vai chuong the nhi');
+	// setTimeout(function(){
+	// 	$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
+	// }, 1000)
+	// setTimeout(function(){
+	// 	$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
+	// }, 2000)
 
 });
