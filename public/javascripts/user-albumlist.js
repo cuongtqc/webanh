@@ -4,8 +4,8 @@ $(document).ready(function(){
 	user.location = '<strong>Home </strong>';
 	user.currentAlbumIndex = 1;// init value
 
-	function updateUserLocation(){
-		$('.location').html(user.location);
+	function updateUserLocation(location){
+		$('.location').html(location);
 	}
 	// Get USER INFO at the moment
 	function getUserState(){
@@ -15,7 +15,7 @@ $(document).ready(function(){
 			success: function(data){
 				console.log('getUserState: ' + data);
 				user = JSON.parse(data);
-				// updateUserLocation();
+				updateUserLocation(user.location);
 			},
 			error: function(err){
 				console.log('getUserState: ' + err);
