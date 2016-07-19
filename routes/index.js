@@ -96,7 +96,7 @@ router.post('/user/current/userInfo', function(req, res){
 
 // For NOT admin user: VIEW PHOTO
 	router.get('/album/:albumAlias', function(req, res){
-		var albumName = req.params.albumAlias.replace('-', ' ');
+		var albumName = req.params.albumAlias.replace(/-/g, ' ');
 		req.session.user.currentAlbumName = albumName;
 		req.session.user.location = '<span id = "text-logo">WEBI</span><strong>&raquo; <a href = "/"> Home</a> &raquo; '+ albumName +'</strong>';
 		req.session.user.currentPhotoIndex = 1;
@@ -105,7 +105,7 @@ router.post('/user/current/userInfo', function(req, res){
 
 	// For NOT admin user: LOAD PHOTO
 	router.post('/resource/get8Photo/:currentAlbumName/:currentPhotoIndex', function(req, res){
-		var currentAlbumName = (req.params.currentAlbumName).replace('-', ' ');
+		var currentAlbumName = (req.params.currentAlbumName).replace(/-/g, ' ');
 		var currentPhotoIndex = parseInt(req.params.currentPhotoIndex) - 1;
 		connection.query(
 			'SELECT * FROM PHOTOS WHERE (PHOTOS.album = "'+currentAlbumName+'") LIMIT 8 OFFSET ' + currentPhotoIndex,
@@ -189,7 +189,7 @@ router.post('/user/current/userInfo', function(req, res){
 	});
 
 	router.get('/admin/album/:albumAlias', function(req, res){
-		var albumName = req.params.albumAlias.replace('-', ' ');
+		var albumName = req.params.albumAlias.replace(/-/g, ' ');
 		req.session.user.currentAlbumName = albumName;
 		req.session.user.location = '<span id = "text-logo">WEBI</span><strong><a href = "/admin"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
 		res.render(publicPath + 'admin-albumdetail.jade', {user: req.session.user.username});
@@ -342,22 +342,28 @@ router.post('/user/current/userInfo', function(req, res){
 											console.log('Error occurs:', err); 
 											res.send('<script>alert("error: '+JSON.stringify(err)+'")</script>')
 										} else {
-											connection.query('UPDATE PHOTOS SET PHOTOS.photoPath = "/allalbum/'+req.body.albumName+'/" PHOTOS.album = "'+req.body.albumName+'" WHERE PHOTOS.album = "'+rows0[0].name+'"', function(err1, rows1, fields1){
-												if (err) { console.log(err1); res.send(err1)}
-												else {
-													console.log('Save successful!');
-													fs.rename(publicPath + 'images/allalbum/' + rows0[0].name, publicPath + 'images/allalbum/' + req.body.albumName, 
-														function(err2){
-															if (err2) {console.log('change folder name failed.')}
-															else {
-																res.send('<script>alert("Change successful.")</script>');
-															}
-													});
+											connection.query('UPDATE PHOTOS SET PHOTOS.photoPath = "/allalbum/'+
+																req.body.albumName+'/" , PHOTOS.album = "'+
+																req.body.albumName+'" WHERE PHOTOS.album = "'+
+																rows0[0].name+'"', 
+												function(err1, rows1, fields1){
+													if (err) { console.log(err1); res.send(err1)}
+													else {
+														console.log('Save successful!');
+														fs.rename(publicPath + 'images/allalbum/' + rows0[0].name, publicPath + 'images/allalbum/' + req.body.albumName, 
+															function(err2){
+																if (err2) {console.log('change folder name failed.')}
+																else {
+																	req.session.user.currentAlbumName = req.body.albumName;
+																	res.send('<script>alert("Change successful.")</script>');
+																}
+														});
+													}
 												}
-											});
+											);
 										}
 									}
-						);
+					);
 					
 				}
 			}

@@ -26,7 +26,6 @@ $(document).ready(function(){
 	getUserState(getPhoto);
 
 	function getPhoto(){
-		//var albumAlias = user.currentAlbumName.replace(' ', '-');
 		$.ajax({
 			type: 'POST',
 			url: '/admin/getPhoto/'+ user.currentAlbumName +'/'+($('.album-boundary').length),
@@ -109,7 +108,7 @@ $(document).ready(function(){
 	})
 	$('#file').change(function(){
 		var fileName = $(this).val();//.substr(12, $(this).val().length);
-		$('#file-info').html(fileName);
+		$('#file-info').html(fileName.split('\\')[fileName.split('\\').length-1]);
 	});
 	$('#add-photo').click(function(){
 		var reader = new FileReader();
@@ -123,6 +122,7 @@ $(document).ready(function(){
     			data: batch,
     			success: function(data){
     				alert('Okay. Uploaded!');
+    				getUserState(function(){});
     				window.location.href = window.location.href;
     			},
     			error: function(err){

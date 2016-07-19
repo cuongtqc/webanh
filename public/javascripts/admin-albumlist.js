@@ -54,7 +54,7 @@ $(document).ready(function(){
 
 				for (var i = 0; i < data.length; i++) {
 					var timestring = new Date(data[i].createAt).toLocaleString();
-					var albumAlias = data[i].name.replace(' ', '-');
+					var albumAlias = data[i].name.replace(/\ /g, '-');
 					var highlight = ((i+1)%2 != 0)?' class = "highlight" ': "";
 					html = html + 	'<tr id = "album-' +data[i].id+ '" '+ hidden + highlight+ ' data-id="'+data[i].id+'">' +
 										'<div class = "clear-both"></div>' +
@@ -161,7 +161,7 @@ $(document).ready(function(){
 					var hidden = '';
 					console.log(data.rows.length);
 					for (var i = 0; i < data.rows.length; i++) {
-						var albumAlias = data.rows[i].name.replace(' ', '-');
+						var albumAlias = data.rows[i].name.replace(/\ /g, '-');
 						html = html + 	'<tr id = "album-' + data.rows[i].id + '" ' + hidden + ' data-id="'+ data.rows[i].id+'">' +
 											'<div class = "clear-both"></div>' +
 											'<td id = "counter">'+ (i+1) +'</td>' +
@@ -199,6 +199,7 @@ $(document).ready(function(){
 			data: data,
 			success: function(result){
 				alert('Album change successfully!.');
+				backup.thisNode.parent().find('a.albumLink').prop('href', '/admin/album/'+data.albumName.replace(/\ /g, '-'));
 				//return promise;
 			},
 			error: function(err){

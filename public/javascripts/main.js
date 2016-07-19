@@ -19,8 +19,29 @@ $(document).ready(function(){
 		});
 	}
 
-	$.fn.sortTable = function(tableId, sortBy){
+	$.fn.showNoti = function(where, noti){
+		
+		if (!where) { where = $(this)}
+		var html = '<div class = "showError left">'+noti+'</div>';
+		var notibar = '<div id = "notiBar"> </div>';
+		if ($('#notiBar').length == 0) {
+			where.append($(notibar));
+		}
 
+		if ($('#notiBar .showError').length > 0) { $(html).insertBefore('#notiBar .showError:last-child')}
+		else {
+			console.log($(html));
+			$('#notiBar').append($(html));
+		}
+		
+		$('#notiBar .showError').animate({boxShadow:"2px 2px 5px 5px white", color:"#f2b632", opacity:0.6},800)
+		.animate({boxShadow:"2px 2px 100px 100px white", color:"#e05038", opacity: 1},800).animate({boxShadow:"2px 2px 5px 5px white", color:"#f2b632", opacity:0.6},800)
+		.animate({boxShadow:"2px 2px 100px 100px white", color:"#e05038", opacity: 1},800).animate({boxShadow:"2px 2px 5px 5px white", color:"#f2b632", opacity:0.6},800)
+		.animate({boxShadow:"2px 2px 100px 100px white", color:"#e05038", opacity: 1},800).animate({boxShadow:"2px 2px 5px 5px white", color:"#f2b632", opacity:0.6},800)
+		.animate({boxShadow:"2px 2px 100px 100px white", color:"#e05038", opacity: 1},800).animate({boxShadow:"2px 2px 5px 5px white", color:"#f2b632", opacity:1},800, function(){
+			$(this).remove();
+			if ($('#notiBar .showError').length == 0) { $('#notiBar').remove();}
+		});
 	}
 
 	// This plugin apply for a table with table-id 

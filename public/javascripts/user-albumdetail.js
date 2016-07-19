@@ -29,7 +29,7 @@ $(document).ready(function(){
 	getUserState([get8Photo]);
 
 	function get8Photo(){
-		var albumAlias = user.currentAlbumName.replace(' ', '-');
+		var albumAlias = user.currentAlbumName.replace(/\ /g, '-');
 		$.ajax({
 			type: 'POST',
 			url: '/resource/get8Photo/'+ albumAlias +'/'+user.currentPhotoIndex,
@@ -80,6 +80,14 @@ $(document).ready(function(){
 		$(this).parent().parent().remove();	
 	})
 	$('#show-more-photo').click(get8Photo);
-	$('body').toggle(400);
+	//$('body').toggle(400);
+
+	$('body > .container').showNoti($('body > .container'), 'Vai chuong the nhi');
+	setTimeout(function(){
+		$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
+	}, 1000)
+	setTimeout(function(){
+		$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
+	}, 2000)
 
 });

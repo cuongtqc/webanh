@@ -40,7 +40,7 @@ $(document).ready(function(){
 
 				for (var i = 0; i < data.length; i++) {
 					var temp = ($.type(data[i].coverName) == 'string')?data[i].coverName:'no-image.png';
-					var albumAlias = data[i].albumName.replace(' ', '-');
+					var albumAlias = data[i].albumName.replace(/\ /g, '-');
 					var timestamp = new Date(data[i].createAt).toLocaleString();
 					html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
 									'<div class = "album-thumb">'+
@@ -75,7 +75,14 @@ $(document).ready(function(){
 	$('#show-more-album').click(function(){
 		get8Album(8);
 	});
-	$('body').toggle(400);
+	//$('body').toggle(400);
 	get8Album(8);
+	$('body > .container').showNoti($('body > .container'), 'Vai chuong the nhi');
+	setTimeout(function(){
+		$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
+	}, 1000)
+	setTimeout(function(){
+		$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
+	}, 2000)
 
 });
