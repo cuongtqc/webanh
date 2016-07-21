@@ -80,14 +80,5 @@ $(document).ready(function(){
 		$(this).parent().parent().remove();	
 	})
 	$('#show-more-photo').click(get8Photo);
-	//$('body').toggle(400);
-
-	$('body > .container').showNoti($('body > .container'), 'Vai chuong the nhi');
-	setTimeout(function(){
-		$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
-	}, 1000)
-	setTimeout(function(){
-		$('body > .container').showNoti($('body > .container'), 'Vfdsafdsafdsai');
-	}, 2000)
 
 });

@@ -42,17 +42,18 @@ $(document).ready(function(){
 
 				for (var i = 0; i < data.length; i++) {
 					var temp = ($.type(data[i].coverName) == 'string')?data[i].coverName:'no-image.png';
-					var albumAlias = data[i].albumName.replace(/\ /g, '-');
+					var albumAlias = data[i].name.replace(/\ /g, '-');
+					var src = (data[i].coverPhoto)?(data[i].name + '/' + temp):temp;
 					var timestamp = new Date(data[i].createAt).toLocaleString();
 					html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
 									'<div class = "album-thumb">'+
 										'<a href="/album/'+albumAlias+'"><img id = "album-thumb'+data[i].id+
-										'" src="images/allalbum/'+data[i].albumName+'/'+temp+
+										'" src="images/allalbum/'+ src +
 										'" alt="no-image" title = "Image"></a>'+
 										'<div id = "toggle"><strong>'+ timestamp+'</strong></div>'+
 									'</div>'+
 									'<div class = "album-title">'+
-										'<span id = "album-title">'+data[i].albumName+'</span>'+
+										'<span id = "album-title">'+data[i].name+'</span>'+
 									'</div>'+
 								'</div>';
 					if (data.length < 8) {

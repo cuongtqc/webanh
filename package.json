@@ -9,9 +9,10 @@
     "express": "~4.13.1",
     "mysql": "*",
     "body-parser": "*",
-    "cookie-parser":"*",
+    "cookie-parser": "*",
     "q": "*",
     "client-sessions": "*",
-    "jade": "*"
+    "jade": "*",
+    "debug": "~2.2.0"
   }
 }
