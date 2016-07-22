@@ -26,10 +26,10 @@ router.post('/user/current/userInfo', function(req, res){
 // For NOT admin user: HOME PAGE
 	router.get('/', function(req, res){
 		if (req.session.user) {
-			req.session.user.location = '<span id = "text-logo">WEBI</span><strong> &raquo; Home </strong>';
+			req.session.user.location = '<img id = "img-logo" src = "images/logo.png" title = "logo"><strong> &raquo; Home </strong>';
 		} else {
 			var user = new User({});
-			user.location = '<span id = "text-logo">WEBI</span><strong> &raquo; Home </strong>';
+			user.location = '<img id = "img-logo" src = "images/logo.png" title = "logo"><strong> &raquo; Home </strong>';
 			req.session.user = user;
 		};
 		res.render(publicPath + 'user-albumlist.jade');
@@ -98,7 +98,7 @@ router.post('/user/current/userInfo', function(req, res){
 	router.get('/album/:albumAlias', function(req, res){
 		var albumName = req.params.albumAlias.replace(/-/g, ' ');
 		req.session.user.currentAlbumName = albumName;
-		req.session.user.location = '<span id = "text-logo">WEBI</span><strong>&raquo; <a href = "/"> Home</a> &raquo; '+ albumName +'</strong>';
+		req.session.user.location = '<img id = "img-logo" src = "../images/logo.png" title = "logo"><strong>&raquo; <a href = "/"> Home</a> &raquo; '+ albumName +'</strong>';
 		req.session.user.currentPhotoIndex = 1;
 		res.render(publicPath + 'user-albumdetail.jade');
 	});
@@ -120,7 +120,7 @@ router.post('/user/current/userInfo', function(req, res){
 					}
 					else {
 						req.session.user.currentPhotoIndex += 8;
-						req.session.user.location = '<span id = "text-logo">WEBI</span><strong><a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
+						req.session.user.location = '<img id = "img-logo" src = "images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
 						console.log(req.session.user.currentPhotoIndex);
 						res.json({ data:rows , user:req.session.user});
 						console.log('Get 8 Photo: Okay, Photos are sent.')
@@ -136,7 +136,7 @@ router.post('/user/current/userInfo', function(req, res){
 		if (req.storage.user) {
 			console.log('req.storage.user = ', req.storage.user);
 			if (req.storage.user.remember) {
-				req.storage.user.location = '<span id = "text-logo">WEBI</span><strong> &raquo; Home</strong>';
+				req.storage.user.location = '<img id = "img-logo" src = "images/logo.png" title = "logo"><strong> &raquo; Home</strong>';
 				req.session.user = req.storage.user;
 				res.render(publicPath + 'admin-albumlist.jade', {user: req.session.user.username});
 			} else {
@@ -145,7 +145,7 @@ router.post('/user/current/userInfo', function(req, res){
 		} else if (req.session.user) {
 			console.log('req.session.user = ', req.session.user);
 			if (req.session.user.logged) {
-				req.session.user.location = '<span id = "text-logo">WEBI</span><strong> &raquo; Home</strong>';
+				req.session.user.location = '<img id = "img-logo" src = "images/logo.png" title = "logo"><strong> &raquo; Home</strong>';
 				res.render(publicPath + 'admin-albumlist.jade', {user: req.session.user.username});
 			} else {
 				res.redirect('/admin/login');
@@ -178,7 +178,7 @@ router.post('/user/current/userInfo', function(req, res){
 						console.log('From LOGIN: Wrote info to client storage');
 					};
 					// Write to session
-					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, location:'<span id = "text-logo">WEBI</span><strong><a href = "/"> &raquo; Home</a></strong>'});
+					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, location:'<img id = "img-logo" src = "images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home</a></strong>'});
 					res.redirect('/admin')
 				} else {
 					console.log('From LOGIN: Username or Password does not match.');
@@ -191,7 +191,7 @@ router.post('/user/current/userInfo', function(req, res){
 	router.get('/admin/album/:albumAlias', function(req, res){
 		var albumName = req.params.albumAlias.replace(/-/g, ' ');
 		req.session.user.currentAlbumName = albumName;
-		req.session.user.location = '<span id = "text-logo">WEBI</span><strong><a href = "/admin"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
+		req.session.user.location = '<img id = "img-logo" src = "../../images/logo.png" title = "logo"><strong><a href = "/admin"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
 		res.render(publicPath + 'admin-albumdetail.jade', {user: req.session.user.username});
 	});
 	
@@ -221,7 +221,7 @@ router.post('/user/current/userInfo', function(req, res){
 	router.post('/admin/getPhoto/:album/:offset', function(req, res){
 		var album = req.params.album;
 		var offset = parseInt(req.params.offset);
-		connection.query('SELECT * FROM PHOTOS WHERE PHOTOS.album = "'+album+'" LIMIT 8 OFFSET ' + offset,
+		connection.query('SELECT PHOTOS.id, PHOTOS.name as name, PHOTOS.photoPath as photoPath, createdAt, ALBUMS.numberOfPhoto as numberOfPhoto  FROM PHOTOS, ALBUMS WHERE PHOTOS.album = "'+album+'" AND ALBUMS.name = "'+album+'" LIMIT 8 OFFSET ' + offset,
 			function(err, rows, fields){
 				if (err) { console.log(err); res.send(err)}
 				else {

@@ -43,7 +43,7 @@ $(document).ready(function(){
 				for (var i = 0; i < data.length; i++) {
 					var temp = ($.type(data[i].coverName) == 'string')?data[i].coverName:'no-image.png';
 					var albumAlias = data[i].name.replace(/\ /g, '-');
-					var src = (data[i].coverPhoto)?(data[i].name + '/' + temp):temp;
+					var src = (data[i].coverName)?(data[i].name + '/' + temp):temp;
 					var timestamp = new Date(data[i].createAt).toLocaleString();
 					html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
 									'<div class = "album-thumb">'+
@@ -62,12 +62,12 @@ $(document).ready(function(){
 				};	
 				$('#show-all-album').append(html);
 				// Mouse hover show date created infor with custom JQ plugin 
-				$('.album-thumb').on('mouseenter',function(){
-						 $(this).toggleUp('0px',$(this).children('#toggle'));
-				});
-				$('.album-thumb').on('mouseleave',function(){
-						 $(this).toggleUp('-30px', $(this).children('#toggle'));
-				});
+				// $('.album-thumb').on('mouseenter',function(){
+				// 		 $(this).toggleUp('0px',$(this).children('#toggle'));
+				// });
+				// $('.album-thumb').on('mouseleave',function(){
+				// 		 $(this).toggleUp('-30px', $(this).children('#toggle'));
+				// });
 			},
 			error: function(err){
 				console.log('From get all album: ' + err);

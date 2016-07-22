@@ -7,8 +7,13 @@ html
     link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
   body
     .container
+      
+      .login-page-background
+      .location.top
+        img#img-logo(src='../images/logo.png', title='logo')
+        strong  » Login
       .login-board
-        .background-image
+        img(src = "../images/loginboard.jpg").background-image
         form(method='post', action='/admin/login')
           .container.clear-both.margin-down.form-input-height
             span.left.col-30 Username
@@ -18,6 +23,8 @@ html
             input#password.right.col-60.text-input(name='password', placeholder='Enter password...')
           .container.clear-both.form-input-height
             .col-40.left
-              input#remember-me(name='remember', type='checkbox')
               span Remember me
             input#login-button.right.col-20(type='submit', value='Login')
+            input#remember-me.left(name='remember', type='checkbox')
+
+       

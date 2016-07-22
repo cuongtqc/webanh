@@ -3,11 +3,20 @@
 	    font-family: helve;
 	    src: url('../fonts/helve.ttf');
 	}
+	@keyframes toggleUp {
+	    from {bottom: -30px}
+	    to {bottom: 0px}
+	}
+	@keyframes toggleDown {
+	    from {bottom: 0px}
+	    to {bottom: -30px}
+	}
 
 /*Tag implement*/
 	body {
-		background-color: #252839;
+		background-color: #e7f3ff;
 		height: auto;
+		position: relative;
 		font-family: helve;
 	}
 
@@ -18,6 +27,7 @@
 
 	table, th, td {
 		border: 1px solid black;
+		position: relative;
 	}
 
 	th {
@@ -37,18 +47,9 @@
 		color: white;
 	}
 
-	#location {
-		/*position: relative;
-		top: 0px;
-		left: 0px;
-		height: 50px; 
-		width: auto;
-		padding: 0px 100px;
-		line-height: 50px;
-		background-color: #677077;
-		border-bottom: 1px solid  #b5b5b7;
-		box-shadow: 5px 0px 10px #b5b5b7;
-		color: #b5b5b7;*/
+	.location * {
+		line-height: 30px;
+		vertical-align: bottom;
 	}
 
 	.location {
@@ -57,15 +58,20 @@
 		left: 0px;
 		height: 50px; 
 		width: auto;
-		padding: 0px 100px;
+		padding: 0px 150px;
 		line-height: 50px;
-		background-color: #677077;
-		border-bottom: 1px solid  #b5b5b7;
+		background-color: #7b1842;
+		border-bottom: 1px solid  #d07118;
 		box-shadow: 5px 0px 10px #b5b5b7;
+		vertical-align: middle;
 		color: #b5b5b7;
 	}
-
-
+	#img-logo {
+		height: 50px;
+		width: auto;
+		margin-right: 20px;
+		display: inline-block;
+	}
 	#text-logo {
 		font-size: 40px;
 		text-transform: uppercase;
@@ -107,8 +113,8 @@
 	
 	/*Login page: login.html*/
 		.login-board {
-			display: block;
-			position: relative;
+			/*display: block;*/
+			position: absolute;
 			top: 150px;
 			left: 25%;
 			width: 40%;
@@ -116,21 +122,53 @@
 			height: auto;
 			border: 1px solid grey;
 			overflow: hidden;
+			color: white;
+			/*background-image: url('../images/loginboard.jpg');*/
+			
 		}
-		.background-image {
+		
+		
+		.login-page-background, .user-album-list-background {
+			position: absolute;
+			background-color: #7b1842;
+			top: 0px;
+			left: 0px;
+			opacity: 0.4;
+			width: 100%;
+			height: 100%;
+		}
+		.background-image{
 			position: absolute;
 			top: -200px;
 			left: 0px;
 			width: 300%;
 			height: 300%;
-			background-image: url('../images/loginboard.jpg');
-			opacity: 0.5;
+			opacity: 1;
 			z-index: -1
 		}
 		.form-input-height {
 			height: 30px;
 		}
-		
+		#login-button {
+			background: #7b1842;
+			border: 1px solid white;
+			color: white;
+			height: 25px;
+		}
+		.form-input-height > span{
+			line-height: 30px;
+			vertical-align: middle;
+		}
+		#remember-me {
+			appearance: none;
+			height: 20px;
+			width: 20px;
+			border: none;
+			margin: 0px;
+			line-height: 20px;
+			background-color: white;
+			vertical-align: middle;
+		}
 	/*Admin page: admin.html*/
 		.header {
 			position: fixed;
@@ -160,14 +198,14 @@
 			text-decoration: none;
 		}
 		.main-container {
-			/*margin-top: 25px;*/
-			margin-right: 100px;
-			margin-left: 100px;
+			margin-top: 15px;
+			margin-right: 150px;
+			margin-left: 150px;
 			border: 1px solid #677077;
 			width: auto;
 			height: auto;
 			/*opacity: 0.7;*/
-			background-color: #677077;
+			background-color: #c66c98;
 			box-shadow: 1 1 2px black, 0 0 25px blue, 0 0 5px darkblue;	
 		}
 		.min-height {
@@ -206,7 +244,7 @@
 				line-height: 20px;
 			}
 			.button-primary {
-				background-color: #0066ff;
+				background-color: #7b1842;
 			}
 			.button-danger {
 				background-color: #ff0000;
@@ -223,6 +261,9 @@
 				height: 20px;
 				font-size: 12px;
 				vertical-align: middle;
+			}
+			.button-small:hover {
+				transform: scale(1.25);
 			}
 			.button-danger-tiny {
 				height: 20px;
@@ -346,8 +387,9 @@
 			padding: 0px 10px;
 			line-height: 28px;
 			background-color: white;
-			border-radius: 10px;
+			border-radius: 3px;
 			vertical-align: center;
+			overflow: hidden;
 		}
 
 		#album-title {
@@ -361,8 +403,8 @@
 
 		.main-container-user-albumlist {
 			margin-top: 25px;
-			margin-right: 100px;
-			margin-left: 100px;
+			margin-right: 150px;
+			margin-left: 150px;
 			padding-bottom: 25px;
 			margin-bottom: 20px;
 			border: 1px solid #b5b5b7;
@@ -376,11 +418,19 @@
 			line-height: 30px;
 			text-transform: uppercase;
 			background-color: white;
-			border-radius: 10px;
+			border-radius: 3px;
 			color: black;
 		}
 		.albumLink{
 			color: #0066ff;
+			border: none;
+			display: block;
+			width: 100%;
+			height: 100%;
+			line-height: 30px;
+			vertical-align: middle;
+			color: white;
+			background: #7b1842;
 		}
 		.left-30 {
 			margin-left: 30%;
@@ -390,6 +440,10 @@
 		}
 
 	/*A few standard*/
+		.top {
+			top: 0px !important;
+			left: 0px;
+		}
 		.margin-down {
 			margin-bottom: 10px;
 		}
@@ -405,6 +459,41 @@
 		}
 		.header-bounder {
 			margin: 10px 20px;
+		}
+		.loader {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 128px;
+			height: auto;
+			/*transition: translate( -50%, -50%);*/
+		}
+		.tooltip-text {
+			display: none;
+			position: absolute;
+			line-height: 30px;
+			background: #7b1842;
+			color: white;
+			vertical-align: middle;
+			width: auto;
+			height: 30px;
+			top: -30px;
+			right: 0px;
+			border: 1px thin white;
+			border-radius: 3px;
+		}
+		td:hover > .tooltip-text {
+			display: block;
+		}
+		body > .background-color {
+			background-color: #7b1842;
+			opacity: 0.4;
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			z-index: -1;
 		}
 		#pop-up-bounder {
 			position: fixed;
@@ -442,6 +531,7 @@
 			/*transform: translate(-50%, -50%);*/
 			z-index: 10000;
 		}
+
 		#toggle {
 			position: absolute;
 			width: 100%;
@@ -450,6 +540,7 @@
 			background-color: rgba(81, 81, 101, 0.5);
 			border-top: 1px solid white;
 			color: white;
+			animation: toggleDown 0.5s;
 		}
 		#toggle-background {
 			position: absolute;
@@ -466,6 +557,10 @@
 			vertical-align: center;
 			font-size: 14px;
 			line-height: 14px;
+		}
+		.album-thumb:hover > #toggle {
+			animation: toggleUp 0.5s; 
+			bottom: 0px;
 		}
 		.showError {
 			/*position: relative;*/

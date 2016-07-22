@@ -8,15 +8,16 @@ html
     link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
   body
     // Body
+    .background-color
     .container.padding-top
       // Header
       .location  
         location#location.left
           // <a href = "#" id = "navigation">Home</a>
           // Display user action: logout
-        .right
-          span#username= user
-          a#logout(href='/admin/logout') Logout
+        
+        span.right#username= user
+        a.right#logout(href='/admin/logout') Logout
       .clear-both
       // Main
       .container.padding-standard

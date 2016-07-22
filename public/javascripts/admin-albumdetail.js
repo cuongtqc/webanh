@@ -40,7 +40,7 @@ $(document).ready(function(){
 						html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
 										'<div class = "album-thumb">'+
 											'<a><img id = "album-thumb'+data[i].id+
-											'" src="/images/allalbum/'+data[i].album + '/'+temp+
+											'" src="/images'+ data[i].photoPath +temp+
 											'" alt="no-image" title = "'+data[i].name+'">'+
 											'</a>'+
 											'<div id = "toggle-background"></div>'+
@@ -48,22 +48,29 @@ $(document).ready(function(){
 																'</strong><a href = "javascript:deletePhoto(\''+data[i].name+'\',\''+data[i].id +'\')"><div  id = "delete-photo" class = "button-danger-tiny right col-30">Delete</div></a></div>'+
 										'</div>'+
 									'</div>';
-						if (data.length < 8 ) {
+						user.numberOfPhoto = data[i].numberOfPhoto;
+						if (data.length < 8 || $('.album-boundary').length == data[i].numberOfPhoto) {
 							$('#show-more-photo').hide();
 						};
 					};	
 					
-				};
+				} else {
+					if ($('.album-boundary').length == 0) {$('#show-all-album').append('This album contains no photos.')};		
+					$('#show-more-photo').hide();
+				}
 				$('#show-all-album').append(html);
+				if ($('.album-boundary').length == user.numberOfPhoto) {
+					$('#show-more-photo').hide();
+				};
 				// Mouse hover show date created infor with custom JQ plugin 
-				$('.album-thumb').on('mouseenter',function(){
-						//alert('Up====');
-						$(this).toggleUp('0px',$(this).children('#toggle'));
-				});
-				$('.album-thumb').on('mouseleave',function(){
-						//alert('Down====');
-						$(this).toggleUp('-30px', $(this).children('#toggle'));
-				});
+				// $('.album-thumb').on('mouseenter',function(){
+				// 		//alert('Up====');
+				// 		$(this).toggleUp('0px',$(this).children('#toggle'));
+				// });
+				// $('.album-thumb').on('mouseleave',function(){
+				// 		//alert('Down====');
+				// 		$(this).toggleUp('-30px', $(this).children('#toggle'));
+				// });
 				window.deletePhoto = function(name, id){
 		
 					$.ajax({
@@ -89,7 +96,7 @@ $(document).ready(function(){
 		});
 	}
 	// Onclick show pop-up
-	$('#show-all-album').on('click', '.album-thumb',function(){
+	$('#show-all-album').on('click', '[id *= "album-thumb"]',function(){
 		$(this).popup();
 	});
 	$('body').on('click', '#pop-up-bounder .button-close', function(){

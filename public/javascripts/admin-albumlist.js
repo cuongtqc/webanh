@@ -1,6 +1,6 @@
 // This javascript module is use for admin home page: admin.html
-
 $(document).ready(function(){
+	$('.loader').remove();
 	var user = {}; //Storage user data 
 	var backup = {}; //Backup prestage
 	var albumData = [];
@@ -59,7 +59,7 @@ $(document).ready(function(){
 					html = html + 	'<tr id = "album-' +data[i].id+ '" '+ hidden + highlight+ ' data-id="'+data[i].id+'">' +
 										'<div class = "clear-both"></div>' +
 										'<td id = "counter">'+ (i+1) +'</td>' +
-										'<td id = "albumName">'+ data[i].name +'</td>' +
+										'<td id = "albumName">'+ data[i].name + '<span class = "tooltip-text">'+data[i].name+'</span></td>' +
 										'<td id = "timestamp">'+ timestring +'</td>' +
 										'<td id = "number-of-photo"><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data[i].numberOfPhoto +'<a></td>' +
 										'<td>'+
@@ -75,6 +75,11 @@ $(document).ready(function(){
 				console.log('From get all album: ' + err);
 			}
 		}).then(function(){
+			var tooltip;
+			
+			if (typeof(Worker) !== "undefined") {
+			    tooltip = new Worker("tooltip.js");
+			}
 			getUserState().then(function(){
 				console.log('NUMBER OF ALBUMS:' + user.numberOfAlbum);
 				$('#pagination').remove();

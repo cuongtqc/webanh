@@ -1,8 +1,12 @@
+$(document).load(function(){
+	$('.loader').fadeOut(200);
+});
+
 $(document).ready(function(){
 	$.fn.popup = function(){
 		html = 	'<div id = "pop-up-bounder">'+ 
 					'<div class = "pop-up-image-and-button">' + 
-						'<img id = "pop-up-image" src = "'+$(this).find('a').find('img').prop('src')+'"></img>'+
+						'<img id = "pop-up-image" src = "'+$(this).prop('src')+'"></img>'+
 						'<img class = "button-close" src = "/images/close.png"></img>'+
 					'</div>'+
 				'</div>';
