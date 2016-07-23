@@ -6,24 +6,25 @@ html
     script(src='/javascripts/user-albumlist.js', type='text/javascript')
     link(rel='stylesheet', type='text/css', href='/stylesheets/reset.css')
     link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
+    style(id='tempstyle')
   body
     // Body
     .loader(hidden)
-    .container.padding-top
-      .user-album-list-background
-      .location
-      // Main
-      .container.padding-standard
-        // Border with title
-        fieldset.main-container-user-albumlist.min-height
-          legend.name-main-container-user-albumlist All Albums
-          // title
-          // List of album
-          .margin-standard
-            #show-all-album.margin-standard
-            .clear-both
-            .container
-              a#show-more-album.button-primary.col-40.left-30(href = 'javascript:void(0)')
-                | Show more albums
-          // End list of album
-        // End border with title
+    #background-color.background-color
+      #body-container.container.padding-top
+        .location
+        // Main
+        .container.padding-standard
+          // Border with title
+          fieldset.main-container-user-albumlist.min-height
+            legend.name-main-container-user-albumlist All Albums
+            // title
+            // List of album
+            .margin-standard
+              #show-all-album.margin-standard
+              .clear-both
+              .container
+                a#show-more-album.button-primary.col-40.left-30(href = 'javascript:void(0)')
+                  | Show more albums
+            // End list of album
+          // End border with title

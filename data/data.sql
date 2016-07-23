@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS USERS (
 );
 
 INSERT INTO USERS (name, username, password, email, numberOfAlbum)
-	VALUES ('Tran', 'quangcuong0808', '123', 'quangcuong0808@gmail.com', 1);
+	VALUES ('Tran', 'quangcuong0808', '123', 'quangcuong0808@gmail.com', 0);
 INSERT INTO USERS (name, username, password, email, numberOfAlbum)
 	VALUES ('Anh', 'anhcuong0808', '123', 'anhcuong0808@gmail.com', 0);
 INSERT INTO USERS (name, username, password, email, numberOfAlbum)

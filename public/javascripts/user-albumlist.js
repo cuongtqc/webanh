@@ -39,13 +39,14 @@ $(document).ready(function(){
 				data = result.data;
 				console.log('From get8Albums: ' + JSON.stringify(data));
 				var html = "";
-
+				
 				for (var i = 0; i < data.length; i++) {
+					user.numberOfAlbum = data[i].numberOfAlbum;
 					var temp = ($.type(data[i].coverName) == 'string')?data[i].coverName:'no-image.png';
 					var albumAlias = data[i].name.replace(/\ /g, '-');
 					var src = (data[i].coverName)?(data[i].name + '/' + temp):temp;
 					var timestamp = new Date(data[i].createAt).toLocaleString();
-					html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
+					html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'" hidden>'+
 									'<div class = "album-thumb">'+
 										'<a href="/album/'+albumAlias+'"><img id = "album-thumb'+data[i].id+
 										'" src="images/allalbum/'+ src +
@@ -61,6 +62,15 @@ $(document).ready(function(){
 					};
 				};	
 				$('#show-all-album').append(html);
+				$('.album-boundary').fadeIn(500);
+				if ($('.album-boundary').length == 0) {
+					$('#show-all-album').append('This album contains no photos.')
+					$('#show-more-album').hide();
+				} else {
+					if (user.numberOfAlbum == $('.album-boundary').length) {
+						$('#show-more-album').hide();
+					}
+				};		
 				// Mouse hover show date created infor with custom JQ plugin 
 				// $('.album-thumb').on('mouseenter',function(){
 				// 		 $(this).toggleUp('0px',$(this).children('#toggle'));
@@ -79,4 +89,7 @@ $(document).ready(function(){
 		get8Album(8);
 	});
 	get8Album(8);
+
+	changeback('tempstyle');
+	setInterval(function(){changeback('tempstyle')}, 3500);
 });

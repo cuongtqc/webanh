@@ -6,39 +6,37 @@ html
     script(src='/javascripts/admin-albumdetail.js', type='text/javascript')
     link(rel='stylesheet', type='text/css', href='/stylesheets/reset.css')
     link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
+    style(id='tempstyle')
   body
     // Body
-    .background-color
-    .container.padding-top
-      // Header
-      .location  
-        location#location.left
-          // <a href = "#" id = "navigation">Home</a>
-          // Display user action: logout
-        
-        span.right#username= user
-        a.right#logout(href='/admin/logout') Logout
-      .clear-both
-      // Main
-      .container.padding-standard
-        // Border with title
-        fieldset.main-container.min-height
-          legend.name-main-container-admin-albumlist Photos
-          // title
-          // List of album
-          .margin-standard
-            #add-photo-tool(data-show='1')
-              | Add photo
-            #add-photo-form(hidden='')
-              input#file.right.add-photo(type='file', name='photo', hidden='')
-              #fake-choose-file Choose file
-              input#add-photo.left(type='button', name='submit', value='Submit')
-              #file-info.right
+    #background-color.background-color
+      #body-container.container.padding-top
+        // Header
+        .location  
+          location#location.left
+          a.right#logout(href='/admin/logout') Logout
+          span.right#username= user
+        .clear-both
+        // Main
+        .container.padding-standard
+          // Border with title
+          fieldset.main-container.min-height
+            legend.name-main-container-admin-albumlist Photos
+            // title
+            // List of album
+            .margin-standard
+              #add-photo-tool(data-show='1')
+                | Add photo
+              #add-photo-form(hidden='')
+                input#file.right.add-photo(type='file', name='photo', hidden='' required)
+                #fake-choose-file Choose file
+                input#add-photo.left(type='button', name='submit', value='Submit')
+                #file-info.right
+                .clear-both
+              #show-all-album.margin-standard.container
               .clear-both
-            #show-all-album.margin-standard.container
-            .clear-both
-            .container
-              a#show-more-photo.button-primary.col-40.left-30(href='javascript:void(0)')
-                | Show more photos
-          // End list of album
+              .container
+                a#show-more-photo.button-classic.margin-down.col-40.left-30(href='javascript:void(0)')
+                  | Show more photos
+            // End list of album
         // End border with title

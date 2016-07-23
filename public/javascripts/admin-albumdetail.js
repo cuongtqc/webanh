@@ -4,7 +4,6 @@ $(document).ready(function(){
 	user.currentPhotoIndex = 1;// init value
 	user.currentAlbumName = '';
 	user.location = 'x';
-
 	function getUserState(functions){
 		var promise = $.ajax({
 			type: 'POST',
@@ -25,10 +24,11 @@ $(document).ready(function(){
 	}
 	getUserState(getPhoto);
 
-	function getPhoto(){
+	function getPhoto(lim){
+		var temp = parseInt(lim)>=0?parseInt(lim) : $('.photo-boundary').length;
 		$.ajax({
 			type: 'POST',
-			url: '/admin/getPhoto/'+ user.currentAlbumName +'/'+($('.album-boundary').length),
+			url: '/admin/getPhoto/'+ user.currentAlbumName +'/'+ temp,
 			success: function(data){
 				getUserState();
 				var html = "";
@@ -37,7 +37,7 @@ $(document).ready(function(){
 						var timestamp = new Date(data[i].createdAt).toLocaleString();
 						var boundarySignature = {photoname: data[i].name, photoid: data[i].id};
 						var temp = ($.type(data[i].name) == 'string')?data[i].name:'no-image.png';
-						html = html + '<div class = "album-boundary left" id = "album-boundary'+data[i].id+'">'+
+						html = html + '<div class = "photo-boundary left" id = "album-boundary'+data[i].id+'" hidden>'+
 										'<div class = "album-thumb">'+
 											'<a><img id = "album-thumb'+data[i].id+
 											'" src="/images'+ data[i].photoPath +temp+
@@ -55,39 +55,34 @@ $(document).ready(function(){
 					};	
 					
 				} else {
-					if ($('.album-boundary').length == 0) {$('#show-all-album').append('This album contains no photos.')};		
+					if ($('.photo-boundary').length == 0) {$('#show-all-album').append('This album contains no photos.')};		
 					$('#show-more-photo').hide();
 				}
 				$('#show-all-album').append(html);
-				if ($('.album-boundary').length == user.numberOfPhoto) {
+				$('.photo-boundary').fadeIn(500);
+				if ($('.photo-boundary').length == user.numberOfPhoto) {
 					$('#show-more-photo').hide();
 				};
-				// Mouse hover show date created infor with custom JQ plugin 
-				// $('.album-thumb').on('mouseenter',function(){
-				// 		//alert('Up====');
-				// 		$(this).toggleUp('0px',$(this).children('#toggle'));
-				// });
-				// $('.album-thumb').on('mouseleave',function(){
-				// 		//alert('Down====');
-				// 		$(this).toggleUp('-30px', $(this).children('#toggle'));
-				// });
-				window.deletePhoto = function(name, id){
 		
-					$.ajax({
-						type: 'POST',
-						url: '/admin/photo/delete',
-						data: {photoname: name},
-						success: function(data){
-							$('#album-boundary'+ id).remove();
-							$('body > .container').showNoti($('body > .container'), 'Delete photo file success!');
-							//alert('Delete file success.');
-							
-						},
-						error: function(err){
-							$('body > .container').showNoti($('body > .container'), 'Delete photo file FAILED!');
-							//alert('Delete file failed.');
-						}
-					});
+				window.deletePhoto = function(name, id){
+					if (confirm('Do you want to DELETE THIS PHOTO ?')) {
+						$.ajax({
+							type: 'POST',
+							url: '/admin/photo/delete',
+							data: {photoname: name},
+							success: function(data){
+								$('#album-boundary'+ id).remove();
+								$('body').showNoti($('body'), 'Delete photo file success!');
+								//getPhoto();
+								//alert('Delete file success.');
+								
+							},
+							error: function(err){
+								$('body').showNoti($('body'), 'Delete photo file FAILED!');
+								//alert('Delete file failed.');
+							}
+						});
+					}
 				}
 			},
 			error: function(err){
@@ -99,10 +94,11 @@ $(document).ready(function(){
 	$('#show-all-album').on('click', '[id *= "album-thumb"]',function(){
 		$(this).popup();
 	});
-	$('body').on('click', '#pop-up-bounder .button-close', function(){
-		$(this).parent().parent().remove();	
-	})
-	$('#show-more-photo').click(getPhoto);
+
+	$('#show-more-photo').click(function(){
+		getPhoto();
+	});
+
 	$('#add-photo-tool').click(function(){
 		$('#add-photo-form').toggle(200);
 		if (parseInt($(this).data('show'))==1) {
@@ -112,37 +108,47 @@ $(document).ready(function(){
 		}
 		$(this).data('show', parseInt($(this).data('show'))*-1);
 	});
+
 	$('#fake-choose-file').click(function(){
 		$('#file').trigger('click');
 	})
+
 	$('#file').change(function(){
 		var fileName = $(this).val();//.substr(12, $(this).val().length);
 		$('#file-info').html(fileName.split('\\')[fileName.split('\\').length-1]);
 	});
-	$('#add-photo').click(function(){
-		var reader = new FileReader();
-    	reader.onload = function(data){
-    		//data = data.target.result;
-    		console.log(data);
-    		var batch = {bin: btoa(data.target.result), filename: $('#file-info').text()}
-    		$.ajax({
-    			type: 'POST',
-    			url: '/admin/photo/upload',
-    			data: batch,
-    			success: function(data){
-    				$('body > .container').showNoti($('body > .container'), 'Okay. Uploaded!');
-    				//alert('Okay. Uploaded!');
-    				getUserState(function(){});
-    				window.location.href = window.location.href;
-    			},
-    			error: function(err){
-    				alert('Oopps! Err: ' + err);
-    			}
-    		});
-    	}
-		reader.readAsBinaryString($('#file')[0].files[0]);		
 
+	$('#add-photo').click(function(){
+		if ($('#file-info').text() == '') {
+			$('body').showNoti($('body'), 'You DID NOT choose a file to upload!');
+		} else {
+			var reader = new FileReader();
+	    	reader.onload = function(data){
+	    		//data = data.target.result;
+	    		console.log(data);
+	    		var batch = {bin: btoa(data.target.result), filename: $('#file-info').text()}
+	    		$.ajax({
+	    			type: 'POST',
+	    			url: '/admin/photo/upload',
+	    			data: batch,
+	    			success: function(data){
+	    				$('body > .container').showNoti($('body > .container'), 'Okay. Uploaded!');
+	    				//alert('Okay. Uploaded!');
+	    				getUserState(function(){});
+	    				window.location.href = window.location.href;
+	    			},
+	    			error: function(err){
+	    				alert('Oopps! Err: ' + err);
+	    			}
+	    		});
+	    	}
+			reader.readAsBinaryString($('#file')[0].files[0]);			
+		}
+		
 	});
 	
-
+	// Change background
+	changeback('tempstyle');
+	setInterval(function(){changeback('tempstyle')}, 3500);
+	//$('#backgound-color').addClass('fdas');
 });

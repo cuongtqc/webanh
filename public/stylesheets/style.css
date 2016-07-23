@@ -15,8 +15,10 @@
 /*Tag implement*/
 	body {
 		background-color: #e7f3ff;
-		height: auto;
+		height: 100%;
 		position: relative;
+		top: 0px;
+		left: 0px;
 		font-family: helve;
 	}
 
@@ -39,7 +41,10 @@
 	td {
 		height: 10px;
 		vertical-align: middle;
-		text-align: center;
+		text-align: center;	
+	}
+
+	tr {
 		background-color: #f0f0f0;
 	}
 
@@ -48,8 +53,8 @@
 	}
 
 	.location * {
-		line-height: 30px;
-		vertical-align: bottom;
+		line-height: 50px;
+		vertical-align: top;
 	}
 
 	.location {
@@ -103,7 +108,7 @@
 		height: 30px;
 		border-radius: 0px;
 		padding: 0px 10px;
-		border: solid 1px #dcdcdc;
+		border: solid 1px #7b1842;
 		/*transition: box-shadow 0.3s, border 0.3s;*/
 	}
 
@@ -136,6 +141,7 @@
 			opacity: 0.4;
 			width: 100%;
 			height: 100%;
+			z-index: -1;
 		}
 		.background-image{
 			position: absolute;
@@ -205,7 +211,7 @@
 			width: auto;
 			height: auto;
 			/*opacity: 0.7;*/
-			background-color: #c66c98;
+			/*background-color: #c66c98;*/
 			box-shadow: 1 1 2px black, 0 0 25px blue, 0 0 5px darkblue;	
 		}
 		.min-height {
@@ -223,7 +229,7 @@
 			margin: 0;
 		}
 		/*Button*/
-			.button-primary, .button-danger, .button-warning, .button-classic .button-inter{
+			.button-primary, .button-danger, .button-warning, .button-inter{
 				display: inline-block;
 				height: 30px;
 				width: 40%;
@@ -235,7 +241,7 @@
 				line-height: 20px;
 			}
 			.button-inter {
-				background-color: #b5b5b7;
+				background-color: #1d609c;
 				height: 20px;
 				width: 40%;
 				margin: 2.5% 5%;
@@ -244,17 +250,28 @@
 				line-height: 20px;
 			}
 			.button-primary {
-				background-color: #7b1842;
+				background-color: #1d609c;
 			}
 			.button-danger {
-				background-color: #ff0000;
+				background-color: #d0711b;
 			}
 			.button-warning {
 				background-color: #ff6600;
 			}
 			.button-classic {
-				background-color: #f3f3f3;
-				color: black;
+				display: inline-block;
+				height: 30px;
+				width: 100%;
+				margin:0px;
+				padding: 0px;
+				border: none;
+				/*border: 1px solid #7b1842;*/
+				color: white;
+				vertical-align: center;
+				text-align: center;
+				overflow: hidden;
+				line-height: 20px;
+				background-color: #7b1842;
 				font-size: 14px;
 			}
 			.button-small {
@@ -282,7 +299,7 @@
 				border: none;
 				vertical-align: middle;
 				text-align: center;
-				background-color: #b5b5b7;
+				background-color: #1d609c;
 				margin-left: 40px;
 				color: white;
 			}
@@ -302,7 +319,8 @@
 				line-height: 30px;
 				font-size: 14px;
 				border: none;
-				background-color: #f2b632;	
+				background-color: #7b1842;	
+				color: white;
 			}
 			#fake-choose-file {
 				height: 30px;
@@ -310,7 +328,7 @@
 				font-size: 14px;
 				color: white;
 				text-align: center;
-				background-color: #b5b5b7;	
+				background-color: #1d609c;	
 				width: auto;
 				margin: 10px 12px;
 			}
@@ -361,11 +379,18 @@
 			position: relative;
 			width: 25%;
 			height: 200px;
+			margin: 10px 0px;
+		}
+		.photo-boundary {
+			position: relative;
+			width: 25%;
+			height: 170px;
+			margin: 10px 0px;
 		}
 		.album-thumb {
 			position: absolute;
-			margin-left: 20px;
-			margin-right: 20px;
+			margin-left: 10px;
+			margin-right: 10px;
 			top: 0px;
 			width: auto;
 			height: 170px;
@@ -379,14 +404,16 @@
 
 		.album-title {
 			position: absolute;
+			display: block;
 			bottom: 0px;
 			left: 50%;
 			transform: translateX(-50%);
-			width: auto; 
+			width: 60%; 
 			height: 26px;
-			padding: 0px 10px;
+			padding: 0px 5px;
 			line-height: 28px;
-			background-color: white;
+			background-color: #7b1842;
+			color: white;
 			border-radius: 3px;
 			vertical-align: center;
 			overflow: hidden;
@@ -394,7 +421,7 @@
 
 		#album-title {
 			display: block;
-			width: auto;
+			width: 100%;
 			text-align: center;
 		}
 		#show-more-album {
@@ -405,7 +432,8 @@
 			margin-top: 25px;
 			margin-right: 150px;
 			margin-left: 150px;
-			padding-bottom: 25px;
+			margin-bottom: 25px;
+			padding-bottom: 0px;
 			margin-bottom: 20px;
 			border: 1px solid #b5b5b7;
 			box-shadow: 1px 1px 5px #b5b5b7;
@@ -417,18 +445,22 @@
 			padding: 0px 10px;
 			line-height: 30px;
 			text-transform: uppercase;
-			background-color: white;
+			background-color: #7b1842;
 			border-radius: 3px;
-			color: black;
+			/*opacity: 0.6;*/
+			color: white;
 		}
-		.albumLink{
-			color: #0066ff;
+		.albumLink {
 			border: none;
 			display: block;
 			width: 100%;
 			height: 100%;
 			line-height: 30px;
 			vertical-align: middle;
+			color: #7b1842;
+			/*background: white;*/
+		}
+		.albumLink:hover {
 			color: white;
 			background: #7b1842;
 		}
@@ -477,23 +509,37 @@
 			vertical-align: middle;
 			width: auto;
 			height: 30px;
-			top: -30px;
+			bottom: 0px;
 			right: 0px;
 			border: 1px thin white;
 			border-radius: 3px;
 		}
-		td:hover > .tooltip-text {
-			display: block;
-		}
-		body > .background-color {
-			background-color: #7b1842;
-			opacity: 0.4;
+
+		/*body > .background-color {
 			width: 100%;
 			height: 100%;
-			position: absolute;
+			position: relative;
+			top: 0px;
+			left: 0px;
+		}
+		body > .background-color:after {
+			content: "";
+			background:url("https://lh4.googleusercontent.com/-6krm9NhMKQ4/V2MGl10uZaI/AAAAAAAAAN4/08cPzkVq9aYXbGwAiqXnWVbGQPI_CBUeQCLcB/s1600/757fda62-8089-4818-91f5-cf958766c493.jpg") no-repeat;
+			background-size: 100% 100%;
+			opacity: 0.6;
+			width: 100%;
+			height: 100%;
+			position: fixed;
 			top: 0px;
 			left: 0px;
 			z-index: -1;
+		}*/
+		.base {
+			opacity: 0;
+		}
+		#body-container {
+			position: relative;
+			z-index: 1;
 		}
 		#pop-up-bounder {
 			position: fixed;
@@ -563,9 +609,6 @@
 			bottom: 0px;
 		}
 		.showError {
-			/*position: relative;*/
-			/*left: -200px;*/
-			/*bottom: 10px;*/
 			min-height: 100px;
 			width: 200px;
 			border: 1px solid white;
@@ -586,13 +629,10 @@
 			right: 10px;
 			opacity: 0.6;
 		}
-		.highlight {
-			background-color: #afafaf !important;
-		}
 		.font-tiny {
 			font-size: 12px;
 		}
-
+	
 	/*Column*/
 		.col-5 {
 			width: 5%;

@@ -5,6 +5,7 @@ $(document).ready(function(){
 	var backup = {}; //Backup prestage
 	var albumData = [];
 	backup.order = {sortBy: 'numberOfPhoto', by: 'ASC'}
+	backup.status = 'okay';
 
 	//user.location = '<strong><a href = "/admin">Home</a> >> Album list</strong>';
 	user.currentAlbumIndex = 1;// init value
@@ -42,7 +43,6 @@ $(document).ready(function(){
 		if (typeof(order) == 'undefined') {
 			order = backup.order;
 		}
-		console.log(order);
 		//order = typeof order !== 'undefined' ? order: {sortBy:'numberOfPhoto', by: 'ASC'};
 		var promise = $.ajax({
 			type: 'POST',
@@ -51,35 +51,53 @@ $(document).ready(function(){
 				console.log('From getAlbums: ' + data);
 				var html = "";
 				var hidden = "";
-
-				for (var i = 0; i < data.length; i++) {
-					var timestring = new Date(data[i].createAt).toLocaleString();
-					var albumAlias = data[i].name.replace(/\ /g, '-');
-					var highlight = ((i+1)%2 != 0)?' class = "highlight" ': "";
-					html = html + 	'<tr id = "album-' +data[i].id+ '" '+ hidden + highlight+ ' data-id="'+data[i].id+'">' +
-										'<div class = "clear-both"></div>' +
-										'<td id = "counter">'+ (i+1) +'</td>' +
-										'<td id = "albumName">'+ data[i].name + '<span class = "tooltip-text">'+data[i].name+'</span></td>' +
-										'<td id = "timestamp">'+ timestring +'</td>' +
-										'<td id = "number-of-photo"><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data[i].numberOfPhoto +'<a></td>' +
-										'<td>'+
-											'<a href = "javascript:void(0)"><div id = "edit" class = "button-primary button-small left">Edit</div></a>'+
-											'<a href = "javascript:void(0)"><div id = "delete" class = "button-danger button-small right">Delete</div></a>'+
-										'</td>'+
-										'<div class = "clear-both"></div>'+
-									'</tr>';
-				};	
+				if (data.length!=0) {
+					for (var i = 0; i < data.length; i++) {
+						var timestring = new Date(data[i].createAt).toLocaleString();
+						var albumAlias = data[i].name.replace(/\ /g, '-');
+						var highlight = '';
+						html = html + 	'<tr id = "album-' +data[i].id+ '" '+ hidden + highlight+ ' data-id="'+data[i].id+'">' +
+											'<div class = "clear-both"></div>' +
+											'<td id = "counter">'+ (i+1) +'</td>' +
+											'<td id = "albumName">&nbsp;'+ data[i].name + '&nbsp;</td>' +
+											'<td id = "timestamp">'+ timestring +'</td>' +
+											'<td id = "number-of-photo"><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data[i].numberOfPhoto +'<a></td>' +
+											'<td>'+
+												'<a href = "javascript:void(0)"><div id = "edit" class = "button-primary button-small left">Edit</div></a>'+
+												'<a href = "javascript:void(0)"><div id = "delete" class = "button-danger button-small right">Delete</div></a>'+
+											'</td>'+
+											'<div class = "clear-both"></div>'+
+										'</tr>';
+					};		
+				}
+				
 				$('#album-list').html(html);
 			},
 			error: function(err){
 				console.log('From get all album: ' + err);
 			}
 		}).then(function(){
-			var tooltip;
-			
-			if (typeof(Worker) !== "undefined") {
-			    tooltip = new Worker("tooltip.js");
-			}
+			$('[id *= albumName]').hover(
+				function(){
+					if (backup.status != 'danger') {
+						var tooltip = $(this);
+						backup.tooltipText = tooltip.text();
+						backup.tooltip = setInterval(function(){
+							tooltip.text(tooltip.text().substr(1) + tooltip.text()[0]);
+						}, 100)
+						$(this).parent().css({'color': 'white','background-color': '#aca81b'});
+							
+					}
+				}, 
+				function(){
+					if (backup.status != 'danger') {
+						clearInterval(backup.tooltip);
+						var tooltip = $(this);
+						tooltip.text(backup.tooltipText);
+						$(this).parent().css({'color': 'black','background-color': '#f0f0f0'});
+					}
+				}
+			);
 			getUserState().then(function(){
 				console.log('NUMBER OF ALBUMS:' + user.numberOfAlbum);
 				$('#pagination').remove();
@@ -107,18 +125,21 @@ $(document).ready(function(){
 	// Set click event for buttons: cancel save edit delete
 		$('#album-list').on('click', '#edit', function(){
 			//Go to edit mode
+			backup.status = 'danger';
 			console.log('Going to Edit mode...');
 			backup.thisNode = $(this).parent().parent();
 			var temp = mode({mode: 'edit', node: backup.thisNode});
 		});
 		$('#album-list').on('click', '#cancel', function(){
 			//Go to cancel change
+			backup.status = 'okay';
 			console.log('Going to cancel change...');
 			backup.thisNode = $(this).parent().parent();
 			mode({mode: 'cancel', node: backup.thisNode});
 		});
 		$('#album-list').on('click', '#save',function(){
 			//Go to save change
+			backup.status = 'danger';
 			console.log('Going to save change...');
 			backup.thisNode = $(this).parent().parent();
 			var temp2 = mode({mode: 'normal', node: backup.thisNode});
@@ -131,6 +152,7 @@ $(document).ready(function(){
 		});
 		$('#album-list').on('click', '#delete', function(){
 			//do something after click delete button
+			backup.status = 'danger';
 			console.log('Going to Delete this...');
 			var currentAlbumName = $(this).parent().parent().parent().find('#albumName').text();
 			var currentAlbumId = $(this).parent().parent().parent().data('id');
@@ -223,19 +245,8 @@ $(document).ready(function(){
 			success: function(result){
 				//alert('Delete successfully!');
 				$('body > .container').showNoti($('body > .container'), 'Delete successfully!');
-				$('#album-'+id).remove();
-				if ($('#album-list').find('tr').length <= 0) {
-					window.location.href = '/admin';
-				} else {
-					$("tr:visible+tr:hidden").slideToggle("fast"); 
-					$('table').parent().parent().find('#pagination').remove();
-					$('table').generatePagination('fieldset > .margin-standard', 10, "pagination");
-					var trlist = $('table > tbody').find('tr');
-					for( i = 0; i < trlist.length; i++){
-						$(trlist[i]).find('#counter').text((i+1));
-					}
-				};
-				//return promise;
+				//$('#album-'+id).remove();
+				setTimeout(function(){window.location.href = '/admin'}, 1000);
 			},
 			error: function(err){
 				//alert('Cannot delete this album because of errors: '+ JSON.stringify(err));
@@ -244,7 +255,8 @@ $(document).ready(function(){
 			}
 		});
 		promise.then(function(){
-			return	 getUserState();
+			//$('table').generatePagination('fieldset > .margin-standard', 10, "pagination");
+			return getUserState();
 		});
 		return promise;
 	}
@@ -282,4 +294,8 @@ $(document).ready(function(){
 		};
 		return {currentAlbumId: currentAlbumId, currentAlbumName: currentAlbumName, input: input};
 	}
+
+	// Change background
+	changeback('tempstyle');
+	setInterval(function(){changeback('tempstyle')}, 3500);
 });

@@ -44,7 +44,7 @@ router.post('/user/current/userInfo', function(req, res){
 
 		connection.query(
 				'SELECT * FROM '+
-					'(SELECT PHOTOS.name as coverName, PHOTOS.album as albumName FROM PHOTOS ORDER BY RAND()) as T ' +
+					'(SELECT PHOTOS.name as coverName, (SELECT COUNT(*) FROM ALBUMS) as numberOfAlbum, PHOTOS.album as albumName FROM PHOTOS ORDER BY RAND()) as T ' +
 				'RIGHT JOIN ALBUMS ON ALBUMS.name = T.albumName GROUP BY ALBUMS.name '+ 
 				'LIMIT '+ limit + ' OFFSET ' + albumIndex,
 				
@@ -106,7 +106,7 @@ router.post('/user/current/userInfo', function(req, res){
 	// For NOT admin user: LOAD PHOTO
 	router.post('/resource/get8Photo/:currentAlbumName/:currentPhotoIndex', function(req, res){
 		var currentAlbumName = (req.params.currentAlbumName).replace(/-/g, ' ');
-		var currentPhotoIndex = parseInt(req.params.currentPhotoIndex) - 1;
+		var currentPhotoIndex = parseInt(req.params.currentPhotoIndex);
 		connection.query(
 			'SELECT * FROM PHOTOS WHERE (PHOTOS.album = "'+currentAlbumName+'") LIMIT 8 OFFSET ' + currentPhotoIndex,
 			function(err, rows, fields){
@@ -116,14 +116,19 @@ router.post('/user/current/userInfo', function(req, res){
 					//console.log(rows);
 					if (rows.length == 0) {
 						console.log('Not have any photo. '); 
-						res.send('Do not have photo to load.')
+						res.send(rows);
 					}
 					else {
-						req.session.user.currentPhotoIndex += 8;
-						req.session.user.location = '<img id = "img-logo" src = "images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
-						console.log(req.session.user.currentPhotoIndex);
-						res.json({ data:rows , user:req.session.user});
-						console.log('Get 8 Photo: Okay, Photos are sent.')
+						//req.session.user.currentPhotoIndex += 8;
+						connection.query('SELECT COUNT(*) as numberOfPhoto FROM PHOTOS WHERE album = "'+currentAlbumName+'"', function(err2, rows2, fields2){
+							if (err2) {console.log(err2); res.send(err2)}
+							else {
+								req.session.user.numberOfPhoto = rows2[0].numberOfPhoto;		
+								req.session.user.location = '<img id = "img-logo" src = "../images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
+								res.send(rows );
+								console.log('Get 8 Photo: Okay, Photos are sent.')
+							}
+						});
 					}
 				}
 			}
@@ -178,7 +183,7 @@ router.post('/user/current/userInfo', function(req, res){
 						console.log('From LOGIN: Wrote info to client storage');
 					};
 					// Write to session
-					req.session.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, location:'<img id = "img-logo" src = "images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home</a></strong>'});
+					req.session.user = new User({username: req.body.username, password: req.body.password, numberOfAlbum: rows[0].numberOfAlbum,remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, location:'<img id = "img-logo" src = "images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home</a></strong>'});
 					res.redirect('/admin')
 				} else {
 					console.log('From LOGIN: Username or Password does not match.');
@@ -208,7 +213,8 @@ router.post('/user/current/userInfo', function(req, res){
 									res.send(err);
 								} else {
 									if (rows.length == 0) {
-										res.send('Do not have album');
+										console.log('Do not have album');
+										res.send(rows);
 									} else {
 										res.json( rows);
 										console.log('Get albums for admin okay. ', rows);
@@ -236,6 +242,7 @@ router.post('/user/current/userInfo', function(req, res){
 	});
 
 	router.post('/admin/addAlbum', function(req, res){
+		//'SELECT * FROM ALBUMS WHERE ALBUMS.name = "fdsa " delete from ALBUMS; select * from ALBUMS where name="3"'
 		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name = "'+ req.body.albumName+'"',
 			function(err, rows, fields){
 				if (err) { console.log(err); res.send(err)}
@@ -379,18 +386,18 @@ router.post('/user/current/userInfo', function(req, res){
 								res.send(err);
 							} else {
 								req.session.user.numberOfAlbum>=1?req.session.user.numberOfAlbum--:req.session.user.numberOfAlbum;
-								connection.query('UPDATE USERS SET USERS.numberOfAlbum = '+(req.session.user.numberOfAlbum)+ ' WHERE USERS.username = "'+ req.session.user.username+'"',
-									function(err, rows, fields){
-										if (err) {
-											console.log(err);
-											res.send(err);
+								connection.query('UPDATE USERS SET USERS.numberOfAlbum = '+req.session.user.numberOfAlbum+ ' WHERE USERS.username = "'+ req.session.user.username+'"',
+									function(err2, rows2, fields2){
+										if (err2) {
+											console.log(err2);
+											res.send(err2);
 										} else {
-											connection.query('DELETE FROM PHOTOS WHERE PHOTOS.album = "' + req.body.albumName + '"', function(err, rows, fields){
-												if (err) { console.log(err); res.send(err)}
+											connection.query('DELETE FROM PHOTOS WHERE PHOTOS.album = "' + req.body.albumName + '"', function(err3, rows3, fields3){
+												if (err3) { console.log(err3); res.send(err3)}
 												else {
 													console.log('Delete successful!');
-													deleteFolderRecursive(publicPath + 'images/allalbum/' + req.body.albumName , function(err){
-														if (err) { res.send(err); console.log(err)}
+													deleteFolderRecursive(publicPath + 'images/allalbum/' + req.body.albumName , function(err4){
+														if (err4) { res.send(err4); console.log(err4)}
 														else {
 															console.log('Deleted Album folder.');
 															req.session.user.location = '<strong> &raquo; Home</strong>';
@@ -448,6 +455,18 @@ router.post('/user/current/userInfo', function(req, res){
 		res.render(publicPath + 'error.jade');
 	});
 
+	
+	router.get('/resource/flyBackground', function(req, res){
+		connection.query('	SELECT * FROM PHOTOS ORDER BY RAND() LIMIT 1', 
+							function(err, rows, fields){
+								if (err) { console.log(err); res.send(err)}
+								else {
+									res.send(rows);
+								}
+							}
+						);
+	});
+
 	//http://www.geedew.com/remove-a-directory-that-is-not-empty-in-nodejs/
 	var deleteFolderRecursive = function(path, callback) {
 	  	if( fs.existsSync(path) ) {
@@ -463,4 +482,6 @@ router.post('/user/current/userInfo', function(req, res){
 	 	}
 	 	return callback(null);
 	};
+
+
 module.exports = router;
