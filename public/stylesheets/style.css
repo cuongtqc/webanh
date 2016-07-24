@@ -365,12 +365,13 @@
 				height: 27px;
 				line-height: 27px;
 				vertical-align: center;
-				border: 1px solid #b5b5b7;
+				border: 1px solid #7b1842;
 				border-radius: 20px;
-				color: #b5b5b7;
+				color: white;
+				background-color: #7b1842;
 			}
 			.active {
-				background-color: #99ff66;
+				background-color: #575757;
 				opacity: 0.8;
 			}
 
