@@ -775,7 +775,7 @@
 		.location {
 			padding: 0px 25px;
 		}
-		.photo-boundary {
+		.photo-boundary, .album-boundary {
 			width: 100%;
 			min-width:  200px;
 		}
