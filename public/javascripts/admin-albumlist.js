@@ -59,7 +59,7 @@ $(document).ready(function(){
 						html = html + 	'<tr id = "album-' +data[i].id+ '" '+ hidden + highlight+ ' data-id="'+data[i].id+'">' +
 											'<div class = "clear-both"></div>' +
 											'<td id = "counter">'+ (i+1) +'</td>' +
-											'<td id = "albumName">&nbsp;'+ data[i].name + '&nbsp;</td>' +
+											'<td id = "albumName">'+ data[i].name + '</td>' +
 											'<td id = "timestamp">'+ timestring +'</td>' +
 											'<td id = "number-of-photo"><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data[i].numberOfPhoto +'<a></td>' +
 											'<td>'+
@@ -81,7 +81,8 @@ $(document).ready(function(){
 				function(){
 					if (backup.status != 'danger') {
 						var tooltip = $(this);
-						backup.tooltipText = tooltip.text();
+						backup.tooltipText = tooltip.text()
+						tooltip.text(' '+tooltip.text()+' ');
 						backup.tooltip = setInterval(function(){
 							tooltip.text(tooltip.text().substr(1) + tooltip.text()[0]);
 						}, 100)
@@ -139,7 +140,7 @@ $(document).ready(function(){
 		});
 		$('#album-list').on('click', '#save',function(){
 			//Go to save change
-			backup.status = 'danger';
+			backup.status = 'okay';
 			console.log('Going to save change...');
 			backup.thisNode = $(this).parent().parent();
 			var temp2 = mode({mode: 'normal', node: backup.thisNode});
