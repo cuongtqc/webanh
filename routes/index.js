@@ -227,7 +227,12 @@ router.post('/user/current/userInfo', function(req, res){
 	router.post('/admin/getPhoto/:album/:offset', function(req, res){
 		var album = req.params.album;
 		var offset = parseInt(req.params.offset);
-		connection.query('SELECT PHOTOS.id, PHOTOS.name as name, PHOTOS.photoPath as photoPath, createdAt, ALBUMS.numberOfPhoto as numberOfPhoto  FROM PHOTOS, ALBUMS WHERE PHOTOS.album = "'+album+'" AND ALBUMS.name = "'+album+'" LIMIT 8 OFFSET ' + offset,
+		connection.query('	SELECT PHOTOS.id,'+
+						' 		PHOTOS.realName as name,'+
+						' 		PHOTOS.photoPath as photoPath, createdAt,'+
+						' 		ALBUMS.numberOfPhoto as numberOfPhoto  FROM PHOTOS, ALBUMS '+
+						'	WHERE PHOTOS.album = "'+album+'" AND ALBUMS.name = "'+album+'" '+
+						'	LIMIT 8 OFFSET ' + offset,
 			function(err, rows, fields){
 				if (err) { console.log(err); res.send(err)}
 				else {
@@ -285,12 +290,13 @@ router.post('/user/current/userInfo', function(req, res){
 		
 		var batch = req.body;
 		var rawBin = batch.bin.replace(/^data:image\/png;base64,/, "");
-		fs.writeFile(publicPath + 'images/allalbum/' + req.session.user.currentAlbumName +'/' + batch.filename, rawBin, 'base64', function(err){
+		var realName = batch.fileid + batch.filename.substr(batch.filename.length-4, batch.filename.length-1);
+		fs.writeFile(publicPath + 'images/allalbum/' + req.session.user.currentAlbumName +'/' + realName, rawBin, 'base64', function(err){
 			if (err) { console.log(err); res.send(err)}
 			else {
 				console.log('Okay upload success!');
-				connection.query(	'INSERT INTO PHOTOS (name, photoPath, album, author) '+
-									'VALUES ("'+batch.filename+'","/allalbum/'+req.session.user.currentAlbumName+'/","'+req.session.user.currentAlbumName+'", "'+req.session.user.username+'") ',
+				connection.query(	'INSERT INTO PHOTOS (id, name, realName, photoPath, album, author) '+
+									'VALUES ('+batch.fileid+' , "'+batch.filename+'","'+ realName +'", "/allalbum/'+req.session.user.currentAlbumName+'/","'+req.session.user.currentAlbumName+'", "'+req.session.user.username+'") ',
 									function(err, rows, fields){
 										if (err) {res.send(err);console.log(err)}
 										else {
@@ -311,7 +317,7 @@ router.post('/user/current/userInfo', function(req, res){
 	
 	router.post('/admin/photo/delete', function(req, res){
 		connection.query(	'DELETE FROM PHOTOS '+
-							'WHERE PHOTOS.name =  "'+req.body.photoname+'"',
+							'WHERE PHOTOS.id =  "'+req.body.photoid+'"',
 							function(err, rows, fields){
 								if (err) {console.log(err); res.send(err)}
 								else {
@@ -395,7 +401,7 @@ router.post('/user/current/userInfo', function(req, res){
 											connection.query('DELETE FROM PHOTOS WHERE PHOTOS.album = "' + req.body.albumName + '"', function(err3, rows3, fields3){
 												if (err3) { console.log(err3); res.send(err3)}
 												else {
-													console.log('Delete successful!');
+													console.log('Delete successful!  ----' + req.body.albumName + '---');
 													deleteFolderRecursive(publicPath + 'images/allalbum/' + req.body.albumName , function(err4){
 														if (err4) { res.send(err4); console.log(err4)}
 														else {

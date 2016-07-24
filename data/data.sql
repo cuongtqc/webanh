@@ -80,13 +80,14 @@ CREATE TABLE IF NOT EXISTS ALBUMS (
 -- 	VALUES ('lakes', 1, 'quangcuong0808');
 
 CREATE TABLE IF NOT EXISTS PHOTOS (
-	id INT(10) NOT NULL AUTO_INCREMENT,
+	id BIGINT NOT NULL,
 	name VARCHAR(100) NOT NULL,
+	realName VARCHAR(100) NOT NULL,
 	photoPath VARCHAR(30) NOT NULL,
 	createdAt TIMESTAMP NOT NULL,
 	album VARCHAR(20) NOT NULL,
 	author VARCHAR(20) NOT NULL,
-	PRIMARY KEY (id, name)
+	PRIMARY KEY (id, realName)
 );
 
 -- INSERT INTO PHOTOS (name, photoPath, album, author)
@@ -136,5 +137,3 @@ CREATE TABLE IF NOT EXISTS PHOTOS (
 -- INSERT INTO PHOTOS (name, photoPath, album, author)
 -- 	VALUES ('image4.png', '/allalbum/', 'album9', 'quangcuong0808');
 
-SELECT * FROM (SELECT *, @row:=@row+1 AS row FROM(SELECT * FROM PHOTOS WHERE (PHOTOS.album = 'gai xinh'))AS t CROSS JOIN (SELECT @row:=0 )AS r) AS BOSS WHERE BOSS.row >= 1 LIMIT 8;
-SELECT * FROM PHOTOS WHERE (PHOTOS.album = 'gai xinh') LIMIT 4 OFFSET 4

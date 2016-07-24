@@ -97,9 +97,10 @@ $(document).ready(function(){
 			success: function(data){
 				if (data.length == 0) {
 					photo = '../../images/loginboard.jpg';
-					slide.text('.background-color0:after {content: "";background:url("'+photo+'") no-repeat;background-size: 100% 100%;opacity: 0.6;width: 100%;height: 100%;position: fixed;top: 0px;left: 0px;/*z-index: -1;*/');
+					slide.text('.background-color0 {width: 100%;height: 100%;position: relative;top: 0px;left: 0px;} .background-color0:after {content: "";background:url("'+photo+'") no-repeat;background-size: 100% 100%;opacity: 0.6;width: 100%;height: 100%;position: fixed;top: 0px;left: 0px;/*z-index: -1;*/');
+					$('#background-color').attr('class','background-color0');
 				} else {
-					photo = '../../images' + data[0].photoPath + data[0].name;
+					photo = '../../images' + data[0].photoPath + data[0].realName;
 					slide.text('.background-color0 {width: 100%;height: 100%;position: relative;top: 0px;left: 0px;} body > .background-color0:after {content: "";background:url("'+photo+'") no-repeat;background-size: cover; background-position: 50% 30%;opacity: 0.5;width: 100%;height: 100%;position: fixed;top: 0px;left: 0px; transition: background ease-in-out 1s');					
 					$('#background-color').attr('class','background-color0');
 

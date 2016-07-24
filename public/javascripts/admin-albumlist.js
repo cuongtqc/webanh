@@ -110,7 +110,7 @@ $(document).ready(function(){
 	getAlbum(0, 10, backup.order);
 
 	// Set click event for buttons sort
-		$('thead>tr').on('click', 'th', function(){
+		$('thead>tr').on('click', 'th#thead-title, th#timestamp, th#numberOfPhoto', function(){
 			backup.order = {};
 			var self = this;
 			backup.order.sortBy = $(this).data('sort');
@@ -155,6 +155,7 @@ $(document).ready(function(){
 			backup.status = 'danger';
 			console.log('Going to Delete this...');
 			var currentAlbumName = $(this).parent().parent().parent().find('#albumName').text();
+			currentAlbumName = currentAlbumName.substr(1, currentAlbumName.length-2);
 			var currentAlbumId = $(this).parent().parent().parent().data('id');
 			if (confirm('Do you really want to delete album: '+currentAlbumName+ ' ?')){
 				deleteAlbum(currentAlbumId, currentAlbumName);

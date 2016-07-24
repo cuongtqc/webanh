@@ -69,7 +69,7 @@ $(document).ready(function(){
 						$.ajax({
 							type: 'POST',
 							url: '/admin/photo/delete',
-							data: {photoname: name},
+							data: {photoname: name, photoid: id},
 							success: function(data){
 								$('#album-boundary'+ id).remove();
 								$('body').showNoti($('body'), 'Delete photo file success!');
@@ -124,9 +124,13 @@ $(document).ready(function(){
 		} else {
 			var reader = new FileReader();
 	    	reader.onload = function(data){
-	    		//data = data.target.result;
+	    		// Simple code generator:
+	    			var code = new Date();
+	    			//var origin = $('#file-info').text() + a.toSeconds();
+
+	    		// End hash code maker
 	    		console.log(data);
-	    		var batch = {bin: btoa(data.target.result), filename: $('#file-info').text()}
+	    		var batch = {bin: btoa(data.target.result), filename: $('#file-info').text(), fileid: code.getTime()}
 	    		$.ajax({
 	    			type: 'POST',
 	    			url: '/admin/photo/upload',
