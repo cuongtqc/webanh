@@ -39,7 +39,7 @@ $(document).ready(function(){
 
 					} else {
 						for (var i = 0; i < data.length; i++) {
-							var temp = ($.type(data[i].name) == 'string')?data[i].name:'no-image.png';
+							var temp = ($.type(data[i].realName) == 'string')?data[i].realName:'no-image.png';
 							var timestamp = new Date(data[i].createdAt).toLocaleString();
 							html = html + '<div class = "photo-boundary left" id = "album-boundary'+data[i].id+'" hidden>'+
 											'<div class = "album-thumb">'+
