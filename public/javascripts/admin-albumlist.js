@@ -60,7 +60,7 @@ $(document).ready(function(){
 											'<div class = "clear-both"></div>' +
 											'<td id = "counter">'+ (i+1) +'</td>' +
 											'<td id = "albumName">'+ data[i].name + '</td>' +
-											'<td id = "timestamp">'+ timestring +'</td>' +
+											'<td id = "timestamp" class = "timestamp">'+ timestring +'</td>' +
 											'<td id = "number-of-photo"><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data[i].numberOfPhoto +'<a></td>' +
 											'<td>'+
 												'<a href = "javascript:void(0)"><div id = "edit" class = "button-primary button-small left">Edit</div></a>'+

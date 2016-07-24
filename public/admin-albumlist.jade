@@ -13,12 +13,11 @@ html
       .container.padding-top#body-container
         // Display navigation link
         .location  
-          location#location.left
+          location#location
             // <a href = "#" id = "navigation">Home</a>
             // Display user action: logout
-          .right
-            span#username= user
-            a#logout(href='/admin/logout') Logout
+          a#logout(href='/admin/logout') Logout
+          span#username= user
         .clear-both
         // End header
         // Main

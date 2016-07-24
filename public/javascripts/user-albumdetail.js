@@ -35,8 +35,8 @@ $(document).ready(function(){
 					console.log('From get8Photo: ' + data);
 					var html = "";
 					if (data.length == 0) { 
+						$('#show-all-album').append('This album does not contains any photo');
 						$('#show-more-photo').hide();
-
 					} else {
 						for (var i = 0; i < data.length; i++) {
 							var temp = ($.type(data[i].realName) == 'string')?data[i].realName:'no-image.png';
@@ -54,12 +54,8 @@ $(document).ready(function(){
 						$('#show-all-album').append(html);
 						if (user.numberOfPhoto == $('.photo-boundary').length) {$('#show-more-photo').hide();}
 						$('.photo-boundary').fadeIn(500);
-						// Onclick show pop-up
-						$('#show-all-album').on('click', '[id *= "album-thumb"]',function(){
-							$(this).popup();
-						});	
+						
 					}
-
 				});
 				
 			},
@@ -71,6 +67,10 @@ $(document).ready(function(){
 	$('body').on('click', '#pop-up-bounder .button-close', function(){
 		$(this).parent().parent().remove();	
 	})
+	// Onclick show pop-up
+	$('#show-all-album').on('click', '[id *= "album-thumb"]',function(){
+		$(this).popup();
+	});	
 	$('#show-more-photo').click(get8Photo);
 	changeback('tempstyle');
 	setInterval(function(){changeback('tempstyle')}, 3500);

@@ -113,4 +113,24 @@ $(document).ready(function(){
 		});
 		return promise;
 	}
+
+	// Resize image for suitable size
+	// $('body').on('load', '.album-thumb img', function(){
+	// 	var self = $(this);
+	// 	// Get original size of image.
+	// 	var realWidth = 0;
+	// 	var realHeight = 0;
+	// 	$('<img/>').attr('src', self.attr('src'))
+	// 				.load(function(){
+	// 					realWith = this.width();
+	// 					realHeight = this.height();
+	// 				});
+	// 	if (self.width() >= realWidth) {
+	// 		self.width('auto');
+	// 	}
+	// 	if (self.width() < realWidth) {
+
+	// 	}
+
+	// });
 });
