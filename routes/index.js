@@ -44,7 +44,7 @@ router.post('/user/current/userInfo', function(req, res){
 
 		connection.query(
 				'SELECT * FROM '+
-					'(SELECT PHOTOS.name as coverName, (SELECT COUNT(*) FROM ALBUMS) as numberOfAlbum, PHOTOS.album as albumName FROM PHOTOS ORDER BY RAND()) as T ' +
+					'(SELECT PHOTOS.realName as coverName, (SELECT COUNT(*) FROM ALBUMS) as numberOfAlbum, PHOTOS.album as albumName FROM PHOTOS ORDER BY RAND()) as T ' +
 				'RIGHT JOIN ALBUMS ON ALBUMS.name = T.albumName GROUP BY ALBUMS.name '+ 
 				'LIMIT '+ limit + ' OFFSET ' + albumIndex,
 				
