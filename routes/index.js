@@ -458,20 +458,27 @@ router.post('/admin/deleteAlbum', function(req, res){
 router.post('/admin/search', function(req, res){
 	var string = JSON.stringify(req.body);
 	if (!string.match(/[\(\)*;\\\>\<\/]+/)) {
-		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name REGEXP "[[:<:]]'+req.body.search+'[[:>:]]"', function(err, rows, fields){
-			if (err) {
-				console.log('Search failed because of: ', err);
-				res.send(err);
-			} else {
-				if (rows.length <= 0) {
-					console.log('Search result has no record.');
-					res.send('Search result has no record');
+		var sql = 	'SELECT * FROM ALBUMS WHERE ALBUMS.owner = "'+ req.session.user.username +
+					'" AND ALBUMS.name REGEXP "[[:<:]]'+req.body.search+'[[:>:]]"';
+		if (req.body.search == '') {
+			res.send('<script>window.location.href = "/admin";</script>');
+		} else {
+			connection.query( sql, function(err, rows, fields){
+				if (err) {
+					console.log('Search failed because of: ', err);
+					res.send(err);
 				} else {
-					console.log('Search result: ', rows);
-					res.json({rows: rows});
+					if (rows.length <= 0) {
+						console.log('Search result has no record.');
+						res.send('<script>alert("No album found.");window.location.href = "/admin";</script>');
+					} else {
+						console.log('Search result: ', rows);
+						res.json({rows: rows});
+					}
 				}
-			}
-		});
+			});
+		}
+
   	} else {
     	res.send('<script>alert("Oops! Input MUST NOT contains (,),/,*,; Do not try to hack this site!.");window.location.href=window.location.href;</script>')
   	}

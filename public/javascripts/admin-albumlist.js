@@ -180,22 +180,23 @@ $(document).ready(function(){
 			url: '/admin/search',
 			data: {search: $('#search-content').val()},
 			success: function(data){
+				console.log(data);
 				if (typeof(data) == 'string') {
-					console.log(data);
-					$('table').parent().parent().hide();
-					if (confirm('Your word does not match any album name. Click Yes/Okay to show preview page.')) {
-						$('table').parent().parent().show();
-					};
+					if (data.indexOf('No album found')>-1) {
+						if (confirm('Your album is not found. Okay to go back.')) {
+							window.location.href = window.location.href;	
+						}
+					}
+					window.location.href = window.location.href;	
 				} else {
 					var localbackup = {rows: $('table > tbody > tr'), pagination: $('#pagination')};
 					$('table').find('tbody').find('tr').remove();
 					$('#pagination').remove();
 					var html = '';
-					var hidden = '';
 					console.log(data.rows.length);
 					for (var i = 0; i < data.rows.length; i++) {
 						var albumAlias = data.rows[i].name.replace(/\ /g, '-');
-						html = html + 	'<tr id = "album-' + data.rows[i].id + '" ' + hidden + ' data-id="'+ data.rows[i].id+'">' +
+						html = html + 	'<tr id = "album-' + data.rows[i].id + '" data-id="'+ data.rows[i].id+'">' +
 											'<div class = "clear-both"></div>' +
 											'<td id = "counter">'+ (i+1) +'</td>' +
 											'<td id = "albumName">'+ data.rows[i].name +'</td>' +
@@ -207,9 +208,6 @@ $(document).ready(function(){
 											'</td>'+
 											'<div class = "clear-both"></div>'+
 										'</tr>';
-						if ( (i+1) % 10 == 0 ) {
-							hidden = " hidden ";
-						}
 					}
 					console.log(html);
 					$('#album-list').append(html);

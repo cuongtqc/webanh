@@ -57,10 +57,9 @@ $(document).ready(function(){
 	$.fn.generatePagination = function(where, limit, id, total, getdata){
 		var limit = parseInt(limit);
 		var albumlist = $(this).find('tbody').find('tr');
-
+		var activeIndex = Math.ceil((parseInt($(this).find('tbody').find('tr:last-child').find('#counter').text()) || 0)/10);
 		var numberOfPage = parseInt(total / limit); // find number of full page
 		if (total % limit != 0) {numberOfPage++}; // take the remaining needed page
-
 		var changePage = function(from, to){
 			getdata(from-1, 10, {sortBy: 'default', by: 'ASC'}).then(function(){
 				$('#'+id).remove();
@@ -70,7 +69,7 @@ $(document).ready(function(){
 		var listpage = "";
 
 		for (var i = 0; i < numberOfPage; i++) {
-			if (i==0) {active = ' active '}
+			if ((i+1)==activeIndex) {active = ' active '}
 			else {active = ''};
 			var from = i * limit +1;
 			var to = ((i+1)*limit < total)? (from + limit -1):(total) ;
@@ -81,11 +80,11 @@ $(document).ready(function(){
 							listpage +
 					'</div>';
 		$(this).parents(where).append(html);
-		
+
 		$('#'+id + '>li a').on('click', function(){
-			$('#'+id).find('a').removeClass('active');
-			$(this).addClass('active');
-			console.log(this);
+			// $('#'+id).find('a').removeClass('active');
+			// $(this).addClass('active');
+			// console.log(this);
 			changePage(parseInt($(this).data('from')), parseInt($(this).data('to')));
 		});
 	}
@@ -116,24 +115,4 @@ $(document).ready(function(){
 		});
 		return promise;
 	}
-
-	// Resize image for suitable size
-	// $('body').on('load', '.album-thumb img', function(){
-	// 	var self = $(this);
-	// 	// Get original size of image.
-	// 	var realWidth = 0;
-	// 	var realHeight = 0;
-	// 	$('<img/>').attr('src', self.attr('src'))
-	// 				.load(function(){
-	// 					realWith = this.width();
-	// 					realHeight = this.height();
-	// 				});
-	// 	if (self.width() >= realWidth) {
-	// 		self.width('auto');
-	// 	}
-	// 	if (self.width() < realWidth) {
-
-	// 	}
-
-	// });
 });

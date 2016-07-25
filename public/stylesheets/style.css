@@ -233,6 +233,22 @@
 				padding: 0;
 				margin: 0;
 			}
+			[action = '/admin/addAlbum'] {
+				position: relative;
+			}
+			.add-icon {
+				position: absolute;
+			    height: 14px;
+			    top: 8px;
+			    left: 3px;
+			    opacity: 0.5;
+			}
+			.s-icon {
+				position: absolute;
+			    height: 16px;
+			    left: calc(30% + 2px);
+			    top: 7px;
+			}
 			/*Button*/
 				.button-primary, .button-danger, .button-warning, .button-inter{
 					display: inline-block;
@@ -270,7 +286,6 @@
 					margin: 0px;
 					padding: 0px;
 					border: none;
-					/*border: 1px solid #7b1842;*/
 					color: white;
 					vertical-align: center;
 					text-align: center;
@@ -516,6 +531,9 @@
 				margin-right: 20px;
 				margin-top: 20px;
 				width: auto;
+			}
+			.icon-space {
+				padding-left: 20px;
 			}
 			.header-bounder {
 				margin: 10px 20px;

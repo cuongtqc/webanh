@@ -33,12 +33,14 @@ html
                 // Create new album form
                 .container.left.col-50
                   form(action='/admin/addAlbum', method='POST')
-                    input.text-input.col-60(type='text', name='albumName', placeholder=' + Name of new album...', required='')
+                    input.text-input.icon-space.col-60(type='text', name='albumName', placeholder='Name of new album...', required='')
+                    img.add-icon(src='images/add-icon.png')
                     input.button-classic.col-30(type='submit', value='Add Album')
                 // Album search box
-                .container.col-50.right
+                .container.col-50.right(style='position:relative')
                   // <form id = "search" action = "/admin/search" method = "POST" accept-charset="utf-8">
-                  input#search-content.text-input.col-70.right(type='text', name='search', placeholder='  Search album by name...', required='')
+                  input#search-content.icon-space.text-input.col-70.right(type='text', name='search', placeholder=' Search album by name...', required='')
+                  img.s-icon(src='images/s-icon.png')
                   // </form>
               .clear-both
               // Show list of album using table
