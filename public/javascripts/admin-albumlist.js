@@ -43,7 +43,6 @@ $(document).ready(function(){
 		if (typeof(order) == 'undefined') {
 			order = backup.order;
 		}
-		//order = typeof order !== 'undefined' ? order: {sortBy:'numberOfPhoto', by: 'ASC'};
 		var promise = $.ajax({
 			type: 'POST',
 			url: '/resource/getAlbum/' + offset + '/' + limit + '/' + JSON.stringify(order),
@@ -58,10 +57,10 @@ $(document).ready(function(){
 						var highlight = '';
 						html = html + 	'<tr id = "album-' +data[i].id+ '" '+ hidden + highlight+ ' data-id="'+data[i].id+'">' +
 											'<div class = "clear-both"></div>' +
-											'<td id = "counter">'+ (i+1) +'</td>' +
+											'<td id = "counter" >'+ (i+1+ offset) +'</td>' +
 											'<td id = "albumName">'+ data[i].name + '</td>' +
-											'<td id = "timestamp" class = "timestamp">'+ timestring +'</td>' +
-											'<td id = "number-of-photo"><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data[i].numberOfPhoto +'<a></td>' +
+											'<td id = "timestamp" class = "timestamp" >'+ timestring +'</td>' +
+											'<td id = "number-of-photo" ><a class = "albumLink" href = "/admin/album/'+albumAlias+'">'+ data[i].numberOfPhoto +'<a></td>' +
 											'<td>'+
 												'<a href = "javascript:void(0)"><div id = "edit" class = "button-primary button-small left">Edit</div></a>'+
 												'<a href = "javascript:void(0)"><div id = "delete" class = "button-danger button-small right">Delete</div></a>'+
@@ -70,7 +69,6 @@ $(document).ready(function(){
 										'</tr>';
 					};		
 				}
-				
 				$('#album-list').html(html);
 			},
 			error: function(err){
@@ -86,8 +84,6 @@ $(document).ready(function(){
 						backup.tooltip = setInterval(function(){
 							tooltip.text(tooltip.text().substr(1) + tooltip.text()[0]);
 						}, 100)
-						// $(this).parent().css({'color': 'white','background-color': '#aca81b'});
-							
 					}
 				}, 
 				function(){
@@ -95,7 +91,6 @@ $(document).ready(function(){
 						clearInterval(backup.tooltip);
 						var tooltip = $(this);
 						tooltip.text(backup.tooltipText);
-						// $(this).parent().css({'color': 'black','background-color': '#f0f0f0'});
 					}
 				}
 			);
@@ -103,6 +98,7 @@ $(document).ready(function(){
 				console.log('NUMBER OF ALBUMS:' + user.numberOfAlbum);
 				$('#pagination').remove();
 				$('table').generatePagination('fieldset > .margin-standard', 10, "pagination", user.numberOfAlbum, function(from, to){ return getAlbum(from, to)});
+				
 			})
 		});
 		return promise;
@@ -111,13 +107,21 @@ $(document).ready(function(){
 	getAlbum(0, 10, backup.order);
 
 	// Set click event for buttons sort
-		$('thead>tr').on('click', 'th#thead-title, th#timestamp, th#numberOfPhoto', function(){
+		$('thead>tr').on('click', 'th#thead-title, th#thead-timestamp, th#thead-numberOfPhoto', function(){
 			backup.order = {};
 			var self = this;
 			backup.order.sortBy = $(this).data('sort');
 			backup.order.by = $(this).data('direction')==1?'ASC':'DESC';
 			getAlbum(backup.offset, backup.limit, backup.order).then(function(){
 				var temp = parseInt($(self).data('direction'))*-1;
+				if (temp == 1) {
+					$(self).find('img').attr('src','images/down.png');
+				} else {
+					$(self).find('img').attr('src','images/up.png');
+				}
+				$(self).find('img').removeClass('sort-icon-hide').addClass('sort-icon-show');
+				$(self).siblings().find('img').removeClass('sort-icon-show').addClass('sort-icon-hide');
+				$(self).siblings().find('img').attr('src','images/none.png');
 				$(self).data('direction', temp);
 			});
 
@@ -245,7 +249,7 @@ $(document).ready(function(){
 			url: '/admin/deleteAlbum',
 			data: {albumId: id, albumName: name},
 			success: function(result){
-				//alert('Delete successfully!');
+				getUserState();
 				$('body > .container').showNoti($('body > .container'), 'Delete successfully!');
 				//$('#album-'+id).remove();
 				setTimeout(function(){window.location.href = '/admin'}, 1000);

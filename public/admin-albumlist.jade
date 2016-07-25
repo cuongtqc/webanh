@@ -46,15 +46,18 @@ html
                 table.container
                   thead
                     tr.container
-                      th#thead-number.col-5(data-direction='1')
+                      th#thead-number(data-direction='1', width='100')
                         .button-classic #
-                      th#thead-title.col-40(data-direction='1', data-sort='name')
+                      th#thead-title(data-direction='1', data-sort='name')
                         .button-classic Title
-                      th#thead-timestamp.col-20(data-direction='1', data-sort='createAt')
+                        img(src='images/none.png').sort-icon-hide
+                      th#thead-timestamp(data-direction='1', data-sort='createAt', width='200')
                         .button-classic Created at
-                      th#thead-numberOfPhoto.col-5(data-direction='1', data-sort='numberOfPhoto')
+                        img(src='images/none.png').sort-icon-hide
+                      th#thead-numberOfPhoto(data-direction='1', data-sort='numberOfPhoto', width='100')
                         .button-classic No.
-                      th#thead-action.col-30(data-direction='1')
+                        img(src='images/none.png').sort-icon-hide
+                      th#thead-action(data-direction='1', width='100')
                         .button-classic Action
                   tbody#album-list
               // Pagination

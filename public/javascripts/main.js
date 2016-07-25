@@ -70,9 +70,11 @@ $(document).ready(function(){
 		var listpage = "";
 
 		for (var i = 0; i < numberOfPage; i++) {
+			if (i==0) {active = ' active '}
+			else {active = ''};
 			var from = i * limit +1;
 			var to = ((i+1)*limit < total)? (from + limit -1):(total) ;
-			listpage += '<li class = "page"><a href = "javascript:void(0)" data-from = "'+from+'" data-to = "'+to+'" >'+ (i+1) +'</a></li>';
+			listpage += '<li class = "page"><a href = "javascript:void(0)" class = "'+active+'" data-from = "'+from+'" data-to = "'+to+'" >'+ (i+1) +'</a></li>';
 		}
 
 		var html = '<div id = "'+id+'" class = "pagination margin-standard">'+
@@ -81,7 +83,9 @@ $(document).ready(function(){
 		$(this).parents(where).append(html);
 		
 		$('#'+id + '>li a').on('click', function(){
-			$(this).addClass('active').siblings().removeClass('active');
+			$('#'+id).find('a').removeClass('active');
+			$(this).addClass('active');
+			console.log(this);
 			changePage(parseInt($(this).data('from')), parseInt($(this).data('to')));
 		});
 	}
@@ -90,7 +94,6 @@ $(document).ready(function(){
 	window.changeback = function(id){
 		var slide = $('#'+ id);
 		var photo = '';
-		// http://2.bp.blogspot.com/-XL3uMFpR0bs/Vjb_1deps8I/AAAAAAAA9IE/8klXmaJKxSI/s1600/hot-girl-8.jpg
 		var promise = $.ajax({
 			type: 'GET',
 			url: '/resource/flyBackground',

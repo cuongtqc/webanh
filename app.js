@@ -21,16 +21,6 @@ app.use(session({secret: '123456789', cookieName: 'storage', cookie: {ephemeral:
 
 app.use('/', routes);
 
-// USER request validation function
-app.use(function(req, res, next){
-  var data = req.body;
-  var string = JSON.stringify(data);
-  if (string.match(/:\ "[^()]+"/g)) {
-    next();
-  } else {
-    res.send('<script>alert("Oops! Do not try to hack this site!.");window.location.href=window.location.href;</script>')
-  }
-});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
