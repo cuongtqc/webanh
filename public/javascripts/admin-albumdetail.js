@@ -96,10 +96,12 @@ $(document).ready(function(){
 	});
 
 	$('#show-more-photo').click(function(){
+		$(this).css({'transition': 'scale3d(0.5, 0.5, 0.5) linear 1s'});
 		getPhoto();
 	});
 
 	$('#add-photo-tool').click(function(){
+		$(this).css({'transition': 'scale3d(0.5, 0.5, 0.5) linear 1s'});
 		$('#add-photo-form').toggle(200);
 		if (parseInt($(this).data('show'))==1) {
 			$(this).text('Cancel');	

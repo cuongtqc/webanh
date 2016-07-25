@@ -86,7 +86,7 @@ $(document).ready(function(){
 						backup.tooltip = setInterval(function(){
 							tooltip.text(tooltip.text().substr(1) + tooltip.text()[0]);
 						}, 100)
-						$(this).parent().css({'color': 'white','background-color': '#aca81b'});
+						// $(this).parent().css({'color': 'white','background-color': '#aca81b'});
 							
 					}
 				}, 
@@ -95,7 +95,7 @@ $(document).ready(function(){
 						clearInterval(backup.tooltip);
 						var tooltip = $(this);
 						tooltip.text(backup.tooltipText);
-						$(this).parent().css({'color': 'black','background-color': '#f0f0f0'});
+						// $(this).parent().css({'color': 'black','background-color': '#f0f0f0'});
 					}
 				}
 			);
@@ -153,10 +153,10 @@ $(document).ready(function(){
 		});
 		$('#album-list').on('click', '#delete', function(){
 			//do something after click delete button
-			backup.status = 'danger';
+			backup.status = 'okay';
 			console.log('Going to Delete this...');
 			var currentAlbumName = $(this).parent().parent().parent().find('#albumName').text();
-			currentAlbumName = currentAlbumName.substr(1, currentAlbumName.length-2);
+			//currentAlbumName = currentAlbumName.substr(1, currentAlbumName.length-2);
 			var currentAlbumId = $(this).parent().parent().parent().data('id');
 			if (confirm('Do you really want to delete album: '+currentAlbumName+ ' ?')){
 				deleteAlbum(currentAlbumId, currentAlbumName);

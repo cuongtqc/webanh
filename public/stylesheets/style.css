@@ -11,6 +11,16 @@
 	    from {bottom: 0px}
 	    to {bottom: -30px}
 	}
+	@keyframes breath_cac81b {
+		from { background-color: white: color:black; }
+		50% { background-color: #cac81b; color:black; }
+		to { background-color: white: color:black; }
+	}
+	@keyframes breath {
+		form {box-shadow: 0px 0px #7b1842}
+		50% {box-shadow: 0px 0px 15px #7b1842}
+		to {box-shadow: 0px 0px #7b1842}
+	}
 /*Responsive with > 728 screen*/
 
 	/*Tag implement*/
@@ -48,6 +58,10 @@
 
 		tr {
 			background-color: #f0f0f0;
+			/*transition: background-color 0.1s linear;*/
+		}
+		tr:hover {
+			animation: breath_cac81b 2s infinite;
 		}
 
 		a {
@@ -78,26 +92,6 @@
 			width: auto;
 			margin-right: 20px;
 			display: inline-block;
-		}
-		#text-logo {
-			font-size: 40px;
-			text-transform: uppercase;
-			color: #b5b5b7;
-			margin-right: 20px;
-			text-shadow: 	0px 0px 0px white,
-							1px 0px 1px white,
-							2px 0px 1px white,
-							3px 0px 1px white,
-							4px 0px 1px white,
-							0px 0px 1px white,
-							0px 0px 1px white,
-							0px 0px 1px white;
-		}
-		#text-logo:hover {
-			transition-property: width, height;
-		    transition-duration: 1s;
-		    transition-timing-function: linear;
-		    transition-delay: 0.5s;
 		}
 
 	/*Class implement*/
@@ -215,15 +209,17 @@
 				margin-top: 15px;
 				margin-right: 150px;
 				margin-left: 150px;
-				border: 1px solid #677077;
 				width: auto;
 				height: auto;
 				/*opacity: 0.7;*/
 				/*background-color: #c66c98;*/
 				box-shadow: 1 1 2px black, 0 0 25px blue, 0 0 5px darkblue;	
 			}
+			.main-container, .main-container-user-albumlist {
+				border: 2px solid #aca81b;
+			}
 			.min-height {
-				min-height: 500px;
+				min-height: 80%;
 			}
 		
 			td > input {
@@ -310,6 +306,15 @@
 					background-color: #1d609c;
 					margin-left: 40px;
 					color: white;
+				}
+				#add-photo-tool:hover, #fake-choose-file:hover, #edit:hover, 
+				#save:hover, #cancel:hover, #delete:hover, #add-photo:hover {
+					animation: breath 2s infinite;
+					border-radius: 3px;
+				}
+				#add-photo-tool:active, #fake-choose-file:active, #edit:active, 
+				#save:active, #cancel:active, #delete:active, #add-photo:active {
+					transition: scale3d(0.8, 0.8, 0.8) linear;
 				}
 				#add-photo-form {
 					position: relative;

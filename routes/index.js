@@ -58,35 +58,39 @@ router.post('/user/current/userInfo', function(req, res){
 					}
 					else {
 						if (req.session.user.username) {
-							connection.query('SELECT numberOfAlbum FROM USERS WHERE USERS.username = "'+req.session.user.username+'"', function(err2, rows2, fields2){
-								if (err2) {res.send(err2)}
-								else if (rows.length >=1 ) {
-									req.session.user.currentAlbumIndex = x + limit-1;
+							connection.query(	'SELECT numberOfAlbum '+
+												'FROM USERS '+
+												'WHERE USERS.username = "'+req.session.user.username+'"', 
+												function(err2, rows2, fields2){
+													if (err2) {res.send(err2)}
+													else if (rows.length >=1 ) {
+														req.session.user.currentAlbumIndex = x + limit-1;
 
-									//console.log('If admin');
+														//console.log('If admin');
 
-									req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
-									console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
-									res.json({ data:rows , user:req.session.user});
-									//console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
-									console.log('Get-all-album: Okay, albums are sent.')
-								};
-							});
+														req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
+														console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
+														res.json({ data:rows , user:req.session.user});
+														//console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
+														console.log('Get-all-album: Okay, albums are sent.')
+													};
+												}
+											);
 						} else {
-							connection.query('SELECT SUM(numberOfAlbum) as numberOfAlbum FROM USERS', function(err2, rows2, fields2){
-								if (err2) {res.send(err2)}
-								else if (rows.length >=1 ) {
-									req.session.user.currentAlbumIndex = x + limit - 1;
-
-									//console.log('If not admin');
-
-									req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
-									console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
-									res.json({ data:rows , user:req.session.user});
-									//console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
-									console.log('Get-all-album: Okay, albums are sent.')
-								};
-							});
+							connection.query(	'SELECT SUM(numberOfAlbum) as numberOfAlbum '+
+												'FROM USERS', 
+												function(err2, rows2, fields2){
+													if (err2) {res.send(err2)}
+													else if (rows.length >=1 ) {
+														req.session.user.currentAlbumIndex = x + limit - 1;
+														req.session.user.numberOfAlbum = rows2[0].numberOfAlbum;
+														//console.log('req.session.user.numberOfAlbum = ',rows2[0].numberOfAlbum);
+														res.json({ data:rows , user:req.session.user});
+														//console.log({ data:JSON.stringify(rows) , user:JSON.stringify(req.session.user)});
+														console.log('Get-all-album: Okay, albums are sent.')
+													};
+												}
+											);
 						}
 						
 					}
@@ -107,32 +111,34 @@ router.post('/user/current/userInfo', function(req, res){
 	router.post('/resource/get8Photo/:currentAlbumName/:currentPhotoIndex', function(req, res){
 		var currentAlbumName = (req.params.currentAlbumName).replace(/-/g, ' ');
 		var currentPhotoIndex = parseInt(req.params.currentPhotoIndex);
-		connection.query(
-			'SELECT * FROM PHOTOS WHERE (PHOTOS.album = "'+currentAlbumName+'") LIMIT 8 OFFSET ' + currentPhotoIndex,
-			function(err, rows, fields){
-
-				if (err) { console.log(" Loading photo error: ", err)}
-				else {
-					//console.log(rows);
-					if (rows.length == 0) {
-						console.log('Not have any photo. '); 
-						res.send(rows);
-					}
-					else {
-						//req.session.user.currentPhotoIndex += 8;
-						connection.query('SELECT COUNT(*) as numberOfPhoto FROM PHOTOS WHERE album = "'+currentAlbumName+'"', function(err2, rows2, fields2){
-							if (err2) {console.log(err2); res.send(err2)}
-							else {
-								req.session.user.numberOfPhoto = rows2[0].numberOfPhoto;		
-								req.session.user.location = '<img id = "img-logo" src = "../images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
-								res.send(rows );
-								console.log('Get 8 Photo: Okay, Photos are sent.')
+		connection.query(	'SELECT * FROM PHOTOS '+
+							'WHERE (PHOTOS.album = "'+currentAlbumName+'") '+
+							'LIMIT 8 OFFSET ' + currentPhotoIndex,
+							function(err, rows, fields){
+								if (err) { console.log(" Loading photo error: ", err)}
+								else {
+									if (rows.length == 0) {
+										console.log('Not have any photo. '); 
+										res.send(rows);
+									}
+									else {
+										connection.query(	'SELECT COUNT(*) as numberOfPhoto '+
+															'FROM PHOTOS '+
+															'WHERE album = "'+currentAlbumName+'"', 
+															function(err2, rows2, fields2){
+																if (err2) {console.log(err2); res.send(err2)}
+																else {
+																	req.session.user.numberOfPhoto = rows2[0].numberOfPhoto;		
+																	req.session.user.location = '<img id = "img-logo" src = "../images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home </a> &raquo; '+ currentAlbumName +'</strong>';
+																	res.send(rows );
+																	console.log('Get 8 Photo: Okay, Photos are sent.')
+																}
+															}
+														);
+									}
+								}
 							}
-						});
-					}
-				}
-			}
-		);
+						);
 	});
 
 
@@ -164,33 +170,35 @@ router.post('/user/current/userInfo', function(req, res){
 
 	router.post('/admin/login', function(req, res){
 		console.log('From USER: Login...');
-		connection.query("SELECT username, password, email, numberOfAlbum FROM USERS WHERE (username='" +
-			req.body.username + 
-			"') AND (password='" + 
-			req.body.password+
-			"');" , 
-			function(err, rows, fields){
-				res.status(200);
-				console.log("rememberme  = " , req.params.remember);
-				var remember = (req.body.remember=='on')?true:false;
-				if (err) { 
-					console.log('From USER -> Login: Something went wrong.');
-					req.redirect('/admin/login');
-				}
-				else if (rows.length>=1) {
-					if (remember == true) { // Write to storage
-						req.storage.user = new User({username: req.body.username, password: req.body.password, remember: remember, logged:true});
-						console.log('From LOGIN: Wrote info to client storage');
-					};
-					// Write to session
-					req.session.user = new User({username: req.body.username, password: req.body.password, numberOfAlbum: rows[0].numberOfAlbum,remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, location:'<img id = "img-logo" src = "images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home</a></strong>'});
-					res.redirect('/admin')
-				} else {
-					console.log('From LOGIN: Username or Password does not match.');
-					res.type('text/html');
-					res.send('<script>alert("Username or Password does not match."); window.location.href="/admin/login";</script>');
-				}
-		});
+		connection.query(	"SELECT username, password, email, numberOfAlbum FROM USERS "+
+							"WHERE (username='" + req.body.username + 
+							"') AND (password='" + req.body.password+ "');" , 
+							function(err, rows, fields){
+								res.status(200);
+								console.log("rememberme  = " , req.params.remember);
+								var remember = (req.body.remember=='on')?true:false;
+								if (err) { 
+									console.log('From USER -> Login: Something went wrong.');
+									req.redirect('/admin/login');
+								}
+								else if (rows.length>=1) {
+									if (remember == true) { // Write to storage
+										req.storage.user = new User({username: req.body.username,remember: remember, logged:true});
+										console.log('From LOGIN: Wrote info to client storage');
+									};
+									// Write to session
+									req.session.user = new User({username: req.body.username, numberOfAlbum: rows[0].numberOfAlbum,
+																remember: remember, logged:true, numberOfAlbum: rows[0].numberOfAlbum, 
+																location:'<img id = "img-logo" src = "images/logo.png" title = "logo"><strong><a href = "/"> &raquo; Home</a></strong>'
+															});
+									res.redirect('/admin')
+								} else {
+									console.log('From LOGIN: Username or Password does not match.');
+									res.type('text/html');
+									res.send('<script>alert("Username or Password does not match."); window.location.href="/admin/login";</script>');
+								}
+							}
+						);
 	});
 
 	router.get('/admin/album/:albumAlias', function(req, res){
@@ -205,8 +213,10 @@ router.post('/user/current/userInfo', function(req, res){
 		var order = JSON.parse(req.params.sort);
 		console.log(order);
 		if (typeof(order)=='undefined') {order = req.session.user.sort} else { req.session.user.sort = order}
-		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.owner = "'+req.session.user.username+ 
-							'" ORDER BY '+order.sortBy+' '+order.by+' LIMIT ' + req.params.limit + ' OFFSET ' + req.params.offset, 
+		connection.query(	'SELECT * FROM ALBUMS '+
+							'WHERE ALBUMS.owner = "'+req.session.user.username+ 
+							'" ORDER BY '+order.sortBy+' '+order.by+
+							' LIMIT ' + req.params.limit + ' OFFSET ' + req.params.offset, 
 							function(err, rows, fields){
 								if (err) {
 									console.log('Err  From getAlbum:', err);
@@ -228,11 +238,11 @@ router.post('/user/current/userInfo', function(req, res){
 		var album = req.params.album;
 		var offset = parseInt(req.params.offset);
 		connection.query('	SELECT PHOTOS.id,'+
-						' 		PHOTOS.realName as name,'+
-						' 		PHOTOS.photoPath as photoPath, createdAt,'+
-						' 		ALBUMS.numberOfPhoto as numberOfPhoto  FROM PHOTOS, ALBUMS '+
-						'	WHERE PHOTOS.album = "'+album+'" AND ALBUMS.name = "'+album+'" '+
-						'	LIMIT 8 OFFSET ' + offset,
+							' PHOTOS.realName as name,'+
+							' PHOTOS.photoPath as photoPath, createdAt,'+
+							' ALBUMS.numberOfPhoto as numberOfPhoto  FROM PHOTOS, ALBUMS '+
+							' WHERE PHOTOS.album = "'+album+'" AND ALBUMS.name = "'+album+'" '+
+							' LIMIT 8 OFFSET ' + offset,
 			function(err, rows, fields){
 				if (err) { console.log(err); res.send(err)}
 				else {
@@ -248,41 +258,42 @@ router.post('/user/current/userInfo', function(req, res){
 
 	router.post('/admin/addAlbum', function(req, res){
 		//'SELECT * FROM ALBUMS WHERE ALBUMS.name = "fdsa " delete from ALBUMS; select * from ALBUMS where name="3"'
-		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name = "'+ req.body.albumName+'"',
-			function(err, rows, fields){
-				if (err) { console.log(err); res.send(err)}
-				else if (rows.length >= 1) {
-					res.send('<script>alert("New album name existed. Please pick another one."); window.location.href = "/admin";</script>');
-				} else if (rows.length == 0) {
-					connection.query('INSERT INTO ALBUMS (name, numberOfPhoto, owner) '+
-									'VALUES ("'+ req.body.albumName+'", 0, "'+req.session.user.username+'");'+
-									'',
-										function(err2, rows2, field2){
-											if (err2) {res.send(err2)}
-											else if (rows2) {
-												console.log("From AddAlbum: ", rows2);
-												req.session.user.numberOfAlbum+=1;
-												connection.query('UPDATE USERS SET numberOfAlbum = ' + 
-																	req.session.user.numberOfAlbum +
-																	' WHERE username = "'+ 
-																	req.session.user.username+'"'
-																	, function(err3, rows3, fields3){
-																		if (err3) { res.send(err3)}
-																		else {
-																			fs.mkdir(publicPath + 'images/allalbum/' + req.body.albumName, function(err){
-																				if (err) {res.send(err); console.log(err)}
-																				else {
-																					console.log('created album folder');
-																					res.send('<script>alert("Add album '+req.body.albumName+' success."); window.location.href = "/admin"</script>');
-																				}
-																			})
-																		}
-												});
-											};
-										}
-					);
-				};
-			}
+		connection.query(	'SELECT * FROM ALBUMS '+
+							'WHERE ALBUMS.name = "'+ req.body.albumName+'"',
+							function(err, rows, fields){
+								if (err) { console.log(err); res.send(err)}
+								else if (rows.length >= 1) {
+									res.send('<script>alert("New album name existed. Please pick another one."); window.location.href = "/admin";</script>');
+								} else if (rows.length == 0) {
+									connection.query(	'INSERT INTO ALBUMS (name, numberOfPhoto, owner) '+
+														'VALUES ("'+ req.body.albumName+'", 0, "'+req.session.user.username+'");'+
+														'',
+														function(err2, rows2, field2){
+															if (err2) {res.send(err2)}
+															else if (rows2) {
+																console.log("From AddAlbum: ", rows2);
+																req.session.user.numberOfAlbum+=1;
+																connection.query(	'UPDATE USERS SET numberOfAlbum = ' + 
+																					req.session.user.numberOfAlbum +
+																					' WHERE username = "'+ 
+																					req.session.user.username+'"'
+																					, function(err3, rows3, fields3){
+																						if (err3) { res.send(err3)}
+																						else {
+																							fs.mkdir(publicPath + 'images/allalbum/' + req.body.albumName, function(err){
+																								if (err) {res.send(err); console.log(err)}
+																								else {
+																									console.log('created album folder');
+																									res.send('<script>alert("Add album '+req.body.albumName+' success."); window.location.href = "/admin"</script>');
+																								}
+																							})
+																						}
+																});
+															};
+														}
+									);
+								};
+							}
 		);
 	});
 
@@ -355,7 +366,7 @@ router.post('/user/current/userInfo', function(req, res){
 											console.log('Error occurs:', err); 
 											res.send('<script>alert("error: '+JSON.stringify(err)+'")</script>')
 										} else {
-											connection.query('UPDATE PHOTOS SET PHOTOS.photoPath = "/allalbum/'+
+											connection.query(	'UPDATE PHOTOS SET PHOTOS.photoPath = "/allalbum/'+
 																req.body.albumName+'/" , PHOTOS.album = "'+
 																req.body.albumName+'" WHERE PHOTOS.album = "'+
 																rows0[0].name+'"', 
@@ -402,8 +413,8 @@ router.post('/user/current/userInfo', function(req, res){
 												if (err3) { console.log(err3); res.send(err3)}
 												else {
 													console.log('Delete successful!  ----' + req.body.albumName + '---');
-													deleteFolderRecursive(publicPath + 'images/allalbum/' + req.body.albumName , function(err4){
-														if (err4) { res.send(err4); console.log(err4)}
+													deleteFolderRecursive(publicPath + 'images/allalbum/' + req.body.albumName , function(x){
+														if (x) { res.send(x); console.log(x)}
 														else {
 															console.log('Deleted Album folder.');
 															req.session.user.location = '<strong> &raquo; Home</strong>';
@@ -486,7 +497,7 @@ router.post('/user/current/userInfo', function(req, res){
 	    	});
 	    	fs.rmdirSync(path);
 	 	}
-	 	return callback(null);
+	 	return callback(fs);
 	};
 
 
