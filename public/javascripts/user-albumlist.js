@@ -13,7 +13,6 @@ $(document).ready(function(){
 			type: 'POST',
 			url: '/user/current/userInfo',
 			success: function(data){
-				console.log('getUserState: ' + data);
 				user = JSON.parse(data);
 				updateUserLocation(user.location);
 			},
@@ -26,9 +25,7 @@ $(document).ready(function(){
 	getUserState();
 
 	function get8Album(limit){
-		console.log('TESTING HERE');
 		var limit = typeof limit !== 'undefined' ?  limit : 8;
-		console.log(limit);
 		$.ajax({
 			type: 'POST',
 			url: '/resource/get8Album/'+user.currentAlbumIndex + '/' + limit,
@@ -37,7 +34,6 @@ $(document).ready(function(){
 				updateUserLocation();
 				var data = result.data;
 				data = result.data;
-				console.log('From get8Albums: ' + JSON.stringify(data));
 				var html = "";
 				if (data) {
 					for (var i = 0; i < data.length; i++) {
@@ -54,7 +50,7 @@ $(document).ready(function(){
 											'<div id = "toggle"><strong>'+ timestamp+'</strong></div>'+
 										'</div>'+
 										'<div class = "album-title">'+
-											'<span id = "album-title">'+data[i].name+'</span>'+
+											'<span id = "album-title">'+data[i].name+' ('+data[i].numberOfPhoto+') '+'</span>'+
 										'</div>'+
 									'</div>';
 						if (data.length < 8) {
@@ -72,13 +68,6 @@ $(document).ready(function(){
 						$('#show-more-album').hide();
 					}
 				};		
-				// Mouse hover show date created infor with custom JQ plugin 
-				// $('.album-thumb').on('mouseenter',function(){
-				// 		 $(this).toggleUp('0px',$(this).children('#toggle'));
-				// });
-				// $('.album-thumb').on('mouseleave',function(){
-				// 		 $(this).toggleUp('-30px', $(this).children('#toggle'));
-				// });
 			},
 			error: function(err){
 				console.log('From get all album: ' + err);
@@ -89,8 +78,9 @@ $(document).ready(function(){
 	$('#show-more-album').click(function(){
 		get8Album(8);
 	});
+	
 	get8Album(8);
 
-	changeback('tempstyle');
-	setInterval(function(){changeback('tempstyle')}, 3500);
+	// changeback('tempstyle');
+	// setInterval(function(){changeback('tempstyle')}, 3500);
 });

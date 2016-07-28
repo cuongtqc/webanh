@@ -21,12 +21,12 @@ INSERT INTO USERS (name, username, password, email, numberOfAlbum)
 	VALUES ('Quang', 'quangquang0808', '123', 'quangquang0808@gmail.com', 0);
 
 CREATE TABLE IF NOT EXISTS ALBUMS (
-	id BIGINT NOT NULL,
+	id BIGINT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(20) NOT NULL,
 	createAt TIMESTAMP,
 	numberOfPhoto INT(10) NOT NULL,
 	owner VARCHAR(20) NOT NULL,
-	PRIMARY KEY (id)
+	PRIMARY KEY (id, name)
 );
 
 -- INSERT INTO ALBUMS (name, numberOfPhoto, owner)

@@ -28,16 +28,16 @@ $(document).ready(function(){
 	}
 
 	$.fn.showNoti = function(where, noti){
-		
 		if (!where) { where = $(this)}
 		var html = '<div class = "showError left">'+noti+'</div>';
 		var notibar = '<div id = "notiBar"> </div>';
+		
 		if ($('#notiBar').length == 0) {
 			where.append($(notibar));
 		}
 
-		if ($('#notiBar .showError').length > 0) { $(html).insertBefore('#notiBar .showError:last-child')}
-		else {
+		if ($('#notiBar .showError').length > 0) { $(html).insertBefore('#notiBar .showError:last-child')
+		} else {
 			$('#notiBar').append($(html));
 		}
 		
@@ -55,13 +55,13 @@ $(document).ready(function(){
 	// to generate corresponding pagination.
 	// Pagination will be add into table parents(where) with id = id and total = total element
 	$.fn.generatePagination = function(where, limit, id, total, getdata){
-		var limit = parseInt(limit);
+		var limit = parseInt(limit)==0?1:parseInt(limit);
 		var albumlist = $(this).find('tbody').find('tr');
-		var activeIndex = Math.ceil((parseInt($(this).find('tbody').find('tr:last-child').find('#counter').text()) || 0)/10);
+		var activeIndex = Math.ceil((parseInt($(this).find('tbody').find('tr:last-child').find('#counter').text()) || 0)/limit);
 		var numberOfPage = parseInt(total / limit); // find number of full page
 		if (total % limit != 0) {numberOfPage++}; // take the remaining needed page
 		var changePage = function(from, to){
-			getdata(from-1, 10, {sortBy: 'default', by: 'ASC'}).then(function(){
+			getdata(from-1, limit, {sortBy: 'default', by: 'ASC'}).then(function(){
 				$('#'+id).remove();
 			});
 		};
@@ -79,12 +79,10 @@ $(document).ready(function(){
 		var html = '<div id = "'+id+'" class = "pagination margin-standard">'+
 							listpage +
 					'</div>';
+		
 		$(this).parents(where).append(html);
 
 		$('#'+id + '>li a').on('click', function(){
-			// $('#'+id).find('a').removeClass('active');
-			// $(this).addClass('active');
-			// console.log(this);
 			changePage(parseInt($(this).data('from')), parseInt($(this).data('to')));
 		});
 	}

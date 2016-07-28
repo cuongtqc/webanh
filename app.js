@@ -4,6 +4,7 @@ var routes = require('./routes/index');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var session = require('client-sessions');
+var User =  require('./routes/users');
 
 var app = express();
 
@@ -45,13 +46,13 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.type('text/html'); 
-  res.send({
-    message: err.message,
-    error: {}
-  });
-});
+// app.use(function(err, req, res, next) {
+//   res.status(err.status || 500);
+//   res.type('text/html'); 
+//   res.send({
+//     message: err.message,
+//     error: {}
+//   });
+// });
 
 module.exports = app;

@@ -11,7 +11,6 @@ $(document).ready(function(){
 			type: 'POST',
 			url: '/user/current/userInfo',
 			success: function(data){
-				console.log('getUserState: ' + data);
 				user = JSON.parse(data);
 				$('#location').html(user.location);
 			},
@@ -19,9 +18,7 @@ $(document).ready(function(){
 				console.log('getUserState: ' + err);
 			}
 		});
-		
 		promise = promise.then(functions);
-		
 	}
 	getUserState(get8Photo);
 
@@ -32,7 +29,6 @@ $(document).ready(function(){
 			url: '/resource/get8Photo/'+ albumAlias +'/'+$('.photo-boundary').length,
 			success: function(data){
 				getUserState(function(){
-					console.log('From get8Photo: ' + data);
 					var html = "";
 					if (data.length == 0) { 
 						$('#show-all-album').append('This album does not contains any photo');
@@ -54,10 +50,8 @@ $(document).ready(function(){
 						$('#show-all-album').append(html);
 						if (user.numberOfPhoto == $('.photo-boundary').length) {$('#show-more-photo').hide();}
 						$('.photo-boundary').fadeIn(500);
-						
 					}
 				});
-				
 			},
 			error: function(err){
 				console.log('From get all album: ' + err);
@@ -72,6 +66,6 @@ $(document).ready(function(){
 		$(this).popup();
 	});	
 	$('#show-more-photo').click(get8Photo);
-	changeback('tempstyle');
-	setInterval(function(){changeback('tempstyle')}, 3500);
+	// changeback('tempstyle');
+	// setInterval(function(){changeback('tempstyle')}, 3500);
 });

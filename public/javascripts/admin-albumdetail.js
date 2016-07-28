@@ -9,23 +9,18 @@ $(document).ready(function(){
 			type: 'POST',
 			url: '/user/current/userInfo',
 			success: function(data){
-				console.log('getUserState: ' + data);
 				user = JSON.parse(data);
-				console.log(user.location);
 				$('#location').html(user.location);
 			},
 			error: function(err){
-				console.log('getUserState: ' + err);
 			}
 		});
-		
 		return promise = promise.then(functions);
-		
 	}
-	getUserState(getPhoto);
+	getUserState(function(){getPhoto(null, 8)});
 
-	function getPhoto(lim){
-		var temp = parseInt(lim)>=0?parseInt(lim) : $('.photo-boundary').length;
+	function getPhoto( offset , lim ){
+		var temp = parseInt(offset)>=0?parseInt(offset) : $('.photo-boundary').length;
 		$.ajax({
 			type: 'POST',
 			url: '/admin/getPhoto/'+ user.currentAlbumName +'/'+ temp,
@@ -49,11 +44,13 @@ $(document).ready(function(){
 										'</div>'+
 									'</div>';
 						user.numberOfPhoto = data[i].numberOfPhoto;
-						if (data.length < 8 || $('.album-boundary').length == data[i].numberOfPhoto) {
+						if ($('.album-boundary').length == data[i].numberOfPhoto) {
 							$('#show-more-photo').hide();
 						};
+						if (i == lim -1) {
+							break;
+						}
 					};	
-					
 				} else {
 					if ($('.photo-boundary').length == 0) {$('#show-all-album').append('This album contains no photos.')};		
 					$('#show-more-photo').hide();
@@ -72,14 +69,11 @@ $(document).ready(function(){
 							data: {photoname: name, photoid: id},
 							success: function(data){
 								$('#album-boundary'+ id).remove();
-								$('body').showNoti($('body'), 'Delete photo file success!');
-								//getPhoto();
-								//alert('Delete file success.');
-								
+								getPhoto(null, 1);
+								$('body').showNoti($('body'), 'Delete photo file success!');							
 							},
 							error: function(err){
 								$('body').showNoti($('body'), 'Delete photo file FAILED!');
-								//alert('Delete file failed.');
 							}
 						});
 					}
@@ -88,6 +82,7 @@ $(document).ready(function(){
 			error: function(err){
 				console.log('From get all album: ' + err);
 			}
+
 		});
 	}
 	// Onclick show pop-up
@@ -97,7 +92,7 @@ $(document).ready(function(){
 
 	$('#show-more-photo').click(function(){
 		$(this).css({'transition': 'scale3d(0.5, 0.5, 0.5) linear 1s'});
-		getPhoto();
+		getPhoto(null, 8);
 	});
 
 	$('#add-photo-tool').click(function(){
@@ -116,7 +111,7 @@ $(document).ready(function(){
 	})
 
 	$('#file').change(function(){
-		var fileName = $(this).val();//.substr(12, $(this).val().length);
+		var fileName = $(this).val();
 		$('#file-info').html(fileName.split('\\')[fileName.split('\\').length-1]);
 	});
 
@@ -125,13 +120,9 @@ $(document).ready(function(){
 			$('body').showNoti($('body'), 'You DID NOT choose a file to upload!');
 		} else {
 			var reader = new FileReader();
+			var ext = $('#file-info').text().substr($('#file-info').text().length-3, $('#file-info').text().length-1);
 	    	reader.onload = function(data){
-	    		// Simple code generator:
-	    			var code = new Date();
-	    			//var origin = $('#file-info').text() + a.toSeconds();
-
-	    		// End hash code maker
-	    		console.log(data);
+	    		var code = new Date();
 	    		var batch = {bin: btoa(data.target.result), filename: $('#file-info').text(), fileid: code.getTime()}
 	    		$.ajax({
 	    			type: 'POST',
@@ -139,7 +130,6 @@ $(document).ready(function(){
 	    			data: batch,
 	    			success: function(data){
 	    				$('body > .container').showNoti($('body > .container'), 'Okay. Uploaded!');
-	    				//alert('Okay. Uploaded!');
 	    				getUserState(function(){});
 	    				window.location.href = window.location.href;
 	    			},
@@ -148,13 +138,16 @@ $(document).ready(function(){
 	    			}
 	    		});
 	    	}
-			reader.readAsBinaryString($('#file')[0].files[0]);			
+	    	if ($('#file')[0].files[0].size > 5242880 || (ext!='png' && ext!='jpeg')) {
+	    		alert('Your file is not PNG or JPEG or too big (<5MB only)');
+	    	} else {
+	    		reader.readAsBinaryString($('#file')[0].files[0]);			
+	    	}
 		}
 		
 	});
 	
 	// Change background
-	changeback('tempstyle');
-	setInterval(function(){changeback('tempstyle')}, 3500);
-	//$('#backgound-color').addClass('fdas');
+	// changeback('tempstyle');
+	// setInterval(function(){changeback('tempstyle')}, 3500);
 });

@@ -18,14 +18,57 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-var validate = function(req, res, next){
-  var data = req.body;
-  var string = JSON.stringify(req.body);
-  if (string.match(/:\ "[^()]+"/)) {
-    next();
-  } else {
-    res.send('<script>alert("Oops! Do not try to hack this site!.");window.location.href=window.location.href;</script>')
-  }
+var validate_admin = function(req, res, next){
+	if (req.url.split('/')[1] == 'admin') {
+	    if (req.session.user) {
+	      	if (req.session.user.logged) { 
+	      		if (req.url.split('/')[2] == 'album') {
+	      			var albumName = req.url.split('/')[3]?req.url.split('/')[3].replace('/-/g', ' '):'';
+	      			connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name = "'+ albumName +'"',
+	      				function( err, rows, fields){
+	      					if (err) { res.send(err)}
+	      					else {
+	      						if (rows.length == 0) {
+	      							res.send('<h2>This is not my album. Do you remember? Redirecting to Admin page...</h2><script>setTimeout(function(){window.location.href = "/admin"}, 1500)</script>')
+	      						}
+	      						else {
+	      							next();
+	      						}
+	      					}
+	      				}
+	      			);
+	      		} else { next();}
+	      	} else {
+	      		res.send('<script>window.location.href = "/admin/login"</script>');
+	      	}
+	    } else {
+	      	res.send('<script>window.location.href = "/admin/login"</script>');
+	    }
+	}
+  	else {
+		next();
+  	}
+};
+
+var validate_user = function(req, res, next){
+	if(req.url.split('/')[1] == 'album') {
+  	var albumName = req.url.split('/')[2]?req.url.split('/')[2].replace('/-/g', ' '):'';
+  	connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name = "'+ albumName +'"',
+      			function( err, rows, fields){
+      				if (err) { res.send(err)}
+      				else {
+      					if (rows.length == 0) {
+      						res.send('<h2>This is not my album. Do you remember? Redirecting to User home page...</h2><script>setTimeout(function(){window.location.href = "/"}, 1500)</script>')
+      					}
+      					else {
+      						next();
+      					}
+      				}
+      			}
+    		);
+	} else {
+	  next();
+	}
 }
 
 // Get USER INFO at the moment
@@ -52,14 +95,15 @@ router.post('/resource/get8Album/:currentAlbumIndex/:limit', function(req, res){
 		var x = parseInt(req.params.currentAlbumIndex);
 		var albumIndex = x - 1;
 		var limit = parseInt(req.params.limit);
-		console.log(limit);
 		connection.query(
 				'SELECT * FROM '+
 					'(SELECT PHOTOS.realName as coverName, (SELECT COUNT(*) FROM ALBUMS) as numberOfAlbum, PHOTOS.album as albumName FROM PHOTOS ORDER BY RAND()) as T ' +
 				'RIGHT JOIN ALBUMS ON ALBUMS.name = T.albumName GROUP BY ALBUMS.name '+ 
 				'LIMIT '+ limit + ' OFFSET ' + albumIndex,	
 			function(err, rows, fields){
-				if (err) { console.log(err)}
+				if (err) { 
+					console.log(err)
+				}
 				else {
 					if (rows.length == 0) {
 						res.send('Dont have any album to load.')
@@ -100,7 +144,7 @@ router.post('/resource/get8Album/:currentAlbumIndex/:limit', function(req, res){
 });
 
 // For NOT admin user: VIEW PHOTO
-router.get('/album/:albumAlias', function(req, res){
+router.get('/album/:albumAlias', validate_user, function(req, res){
 	var string = ''+req.params.albumAlias;
 	if (!string.match(/[\(\)*;\\\>\<\/]+/)) {
 		var albumName = req.params.albumAlias.replace(/-/g, ' ');
@@ -204,7 +248,7 @@ router.post('/admin/login', function(req, res){
   	}
 });
 
-router.get('/admin/album/:albumAlias', function(req, res){
+router.get('/admin/album/:albumAlias', validate_admin, function(req, res){
 	var string = JSON.stringify(req.params.albumAlias);
 	var albumName = req.params.albumAlias.replace(/-/g, ' ');
 	if (!string.match(/[\(\)*;\\\>\<\/]+/)) {
@@ -216,7 +260,7 @@ router.get('/admin/album/:albumAlias', function(req, res){
 						res.send('<H2>This album does not exists</H2>');
 					}
 					else {
-						var albumName = req.params.albumAlias.replace(/-/g, ' ');
+						var albumName = req.params.albumAlias?req.params.albumAlias.replace(/-/g, ' '):'';
 						req.session.user.currentAlbumName = albumName;
 						req.session.user.location = '<img id = "img-logo" src = "../../images/logo.png" title = "logo"><strong><a href = "/admin"> &raquo; Home</a> &raquo; '+ albumName +'</strong>';
 						res.render(publicPath + 'admin-albumdetail.jade', {user: req.session.user.username});
@@ -243,7 +287,6 @@ router.post('/resource/getAlbum/:offset/:limit/:sort', function(req, res){
 
 		connection.query( sql,function(err, rows, fields){
 				if (err) {
-					console.log('Err  From getAlbum:', err);
 					res.send(err);
 				} else {
 					if (rows.length == 0) {
@@ -284,6 +327,9 @@ router.post('/admin/getPhoto/:album/:offset', function(req, res){
 router.post('/admin/addAlbum', function(req, res){
 	var string = JSON.stringify(req.body.albumName);
 	if (!string.match(/[\(\)*;\\\>\<\/]+/)) {
+		if (req.body.albumName.trim().length == 0) {
+			return res.send('<script>alert("Album name must not only contains blank.");window.location.href = "/admin"</script>');
+		}
 		var sql = 	'SELECT * FROM ALBUMS '+
 					'WHERE ALBUMS.name = "'+ req.body.albumName+'"';
 		connection.query( sql, function(err, rows, fields){
@@ -324,12 +370,11 @@ router.post('/admin/addAlbum', function(req, res){
 });
 
 router.post('/admin/photo/upload', function(req, res){
-	// add validate size of file here
 	var batch = req.body;
 	var rawBin = batch.bin.replace(/^data:image\/png;base64,/, "");
 	var realName = batch.fileid + batch.filename.substr(batch.filename.length-4, batch.filename.length-1);
-	fs.writeFile(publicPath + 'images/allalbum/' + req.session.user.currentAlbumName +'/' + realName, rawBin, 'base64', function(err){
-		if (err) { console.log(err); res.send(err)}
+	fs.writeFile(publicPath + 'images/allalbum/' + req.session.user.currentAlbumName +'/' + realName, rawBin, 'base64', function(err1){
+		if (err1) { console.log(err1); res.send(err1)}
 		else {
 			var sql = 	'INSERT INTO PHOTOS (id, name, realName, photoPath, album, author) '+
 						'VALUES ('+batch.fileid+' , "'+batch.filename+'","'+ realName +'", "/allalbum/'+
@@ -382,37 +427,48 @@ router.post('/admin/photo/delete', function(req, res){
 router.post('/admin/saveChange', function(req, res){
 	var string = JSON.stringify(req.body);
 	if (!string.match(/[\(\)*;\\\>\<\/]+/)) {
-		connection.query('SELECT ALBUMS.name FROM ALBUMS WHERE id = '+req.body.albumId, function(err0, rows0, fields0){
-			if (err0) {console.log(err0); res.send(err0)}
-			else {
-				var sql = 	"UPDATE ALBUMS SET ALBUMS.name = " + req.body.albumName
-					sql +=	" WHERE ALBUMS.id = " + req.body.albumId				
-				connection.query(sql, function(err, rows, fields){
-					if (err) {
-						console.log('Error occurs:', err); 
-						res.send('<script>alert("error: '+JSON.stringify(err)+'")</script>');
-					} else {
-						var sql =	'UPDATE PHOTOS SET PHOTOS.photoPath = "/allalbum/'+
-									req.body.albumName+'/" , PHOTOS.album = "'+
-									req.body.albumName+'" WHERE PHOTOS.album = "'+
-									rows0[0].name+'"';
-						connection.query( sql, function(err1, rows1, fields1){
-							if (err) { console.log(err1); res.send(err1)}
-							else {
-								fs.rename(publicPath + 'images/allalbum/' + rows0[0].name, publicPath + 'images/allalbum/' + req.body.albumName, 
-									function(err2){
-										if (err2) {console.log('change folder name failed.')}
+		connection.query('SELECT * FROM ALBUMS WHERE ALBUMS.name = "'+ req.body.albumName +'"', function(err3, rows3, fields3){
+			if (err3) {
+				console.log(err3);
+				res.send(err3);
+			} else {
+				if (rows3.length > 0) {
+					res.send('<script>alert("Album name existed.");window.location.href="/admin"</script>');
+				} else {
+					connection.query('SELECT ALBUMS.name FROM ALBUMS WHERE id = '+req.body.albumId, function(err0, rows0, fields0){
+						if (err0) {console.log(err0); res.send(err0)}
+						else {
+							var sql = 	'UPDATE ALBUMS SET ALBUMS.name = "' + req.body.albumName
+								sql +=	'" WHERE ALBUMS.id = ' + req.body.albumId				
+							connection.query(sql, function(err, rows, fields){
+								if (err) {
+									console.log('Error occurs:', err); 
+									res.send('<script>alert("error: '+JSON.stringify(err)+'")</script>');
+								} else {
+									var sql =	'UPDATE PHOTOS SET PHOTOS.photoPath = "/allalbum/'+
+												req.body.albumName+'/" , PHOTOS.album = "'+
+												req.body.albumName+'" WHERE PHOTOS.album = "'+
+												rows0[0].name+'"';
+									connection.query( sql, function(err1, rows1, fields1){
+										if (err) { console.log(err1); res.send(err1)}
 										else {
-											req.session.user.currentAlbumName = req.body.albumName;
-											res.send('<script>alert("Change successful.")</script>');
+											fs.rename(publicPath + 'images/allalbum/' + rows0[0].name, publicPath + 'images/allalbum/' + req.body.albumName, 
+												function(err2){
+													if (err2) {console.log('change folder name failed.')}
+													else {
+														req.session.user.currentAlbumName = req.body.albumName;
+														res.send('<script>alert("Change successful.")</script>');
+													}
+											});
 										}
-								});
-							}
-						});
-					}
-				});		
+									});
+								}
+							});		
+						}
+					});
+				}
 			}
-		});
+		})
   	} else {
     	res.send('<script>alert("Oops! Input MUST NOT contains (,),/,*,;  Do not try to hack this site!.");window.location.href=window.location.href;</script>')
   	}
@@ -457,9 +513,10 @@ router.post('/admin/deleteAlbum', function(req, res){
 
 router.post('/admin/search', function(req, res){
 	var string = JSON.stringify(req.body);
+	var searchString = '%' + req.body.search + '%';
 	if (!string.match(/[\(\)*;\\\>\<\/]+/)) {
 		var sql = 	'SELECT * FROM ALBUMS WHERE ALBUMS.owner = "'+ req.session.user.username +
-					'" AND ALBUMS.name REGEXP "[[:<:]]'+req.body.search+'[[:>:]]"';
+					'" AND ALBUMS.name LIKE "'+searchString+'"';
 		if (req.body.search == '') {
 			res.send('<script>window.location.href = "/admin";</script>');
 		} else {
@@ -469,10 +526,8 @@ router.post('/admin/search', function(req, res){
 					res.send(err);
 				} else {
 					if (rows.length <= 0) {
-						console.log('Search result has no record.');
 						res.send('<script>alert("No album found.");window.location.href = "/admin";</script>');
 					} else {
-						console.log('Search result: ', rows);
 						res.json({rows: rows});
 					}
 				}

@@ -8,6 +8,7 @@ html
     link(rel='stylesheet', type='text/css', href='/stylesheets/reset.css')
     link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
     style(id='tempstyle')
+    script(id='tempscript')
   body
     // Body
     .background-color#background-color
@@ -33,13 +34,13 @@ html
                 // Create new album form
                 .container.left.col-50
                   form(action='/admin/addAlbum', method='POST')
-                    input.text-input.icon-space.col-60(type='text', name='albumName', placeholder='Name of new album...', required='')
+                    input.text-input.icon-space.col-60(type='text', name='albumName', placeholder='Name of new album...', required='' maxlength='20')
                     img.add-icon(src='images/add-icon.png')
                     input.button-classic.col-30(type='submit', value='Add Album')
                 // Album search box
                 .container.col-50.right(style='position:relative')
                   // <form id = "search" action = "/admin/search" method = "POST" accept-charset="utf-8">
-                  input#search-content.icon-space.text-input.col-70.right(type='text', name='search', placeholder=' Search album by name...', required='')
+                  input#search-content.icon-space.text-input.col-70.right(type='text', name='search', placeholder='Search album by name...', required='')
                   img.s-icon(src='images/s-icon.png')
                   // </form>
               .clear-both
@@ -53,13 +54,13 @@ html
                       th#thead-title(data-direction='1', data-sort='name')
                         .button-classic Title
                         img(src='images/none.png').sort-icon-hide
-                      th#thead-timestamp(data-direction='1', data-sort='createAt', width='200')
+                      th#thead-timestamp(data-direction='1', data-sort='createAt', width='180')
                         .button-classic Created at
                         img(src='images/none.png').sort-icon-hide
                       th#thead-numberOfPhoto(data-direction='1', data-sort='numberOfPhoto', width='100')
                         .button-classic No.
                         img(src='images/none.png').sort-icon-hide
-                      th#thead-action(data-direction='1', width='100')
+                      th#thead-action(data-direction='1', width='180')
                         .button-classic Action
                   tbody#album-list
               // Pagination
